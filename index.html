@@ -463,28 +463,30 @@
             <h4 class="contact-sub-title padd-15">I'M VERY REPOSIVE TO MESSAGES</h4>
             <!-- Contact Form -->
             <div class="row">
-              <div class="contact-form padd-15" id="contactForm">
+              <form class="contact-form padd-15" id="contactForm">
                 <div class="row">
                   <div class="form-item col-6 padd-15">
                     <div class="form-group">
-                      <input type="text" class="form-control" placeholder="Your Name" name="from_name" />
+                      <input type="text" class="form-control" placeholder="Your Name" name="name" required />
                     </div>
                   </div>
                   <div class="form-item col-6 padd-15">
-                    <div class="form-group"><input type="email" class="form-control" placeholder="Email" name="reply_to" /></div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="form-item col-12 padd-15">
                     <div class="form-group">
-                      <input type="text" class="form-control" placeholder="Subject" />
+                      <input type="email" class="form-control" placeholder="Email" name="email" required />
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="form-item col-12 padd-15">
                     <div class="form-group">
-                      <textarea name="message" class="form-control" id="" placeholder="Message"></textarea>
+                      <input type="text" class="form-control" placeholder="Subject" name="title" required />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-item col-12 padd-15">
+                    <div class="form-group">
+                      <textarea name="message" class="form-control" placeholder="Message" required></textarea>
                     </div>
                   </div>
                 </div>
@@ -493,7 +495,7 @@
                     <button type="submit" class="btn" id="btnSend">Send Message</button>
                   </div>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </section>
@@ -533,22 +535,22 @@
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
     <script>
       (function () {
-        emailjs.init("xOSEf_NpfLI1RmerL"); // Thay bằng public key thật
+        emailjs.init("xOSEf_NpfLI1RmerL"); // Dán public key của bạn
       })();
-      document.getElementById("btnSend").addEventListener("click", function () {
-        const name = document.querySelector('input[name="from_name"]').value;
-        const email = document.querySelector('input[name="reply_to"]').value;
-        const message = document.querySelector('textarea[name="message"]').value;
 
-        emailjs
-          .send("service_ntj7u7a", "template_cyv4bxf", {
-            from_name: name,
-            reply_to: email,
-            message: message,
-          })
-          .then(() => alert("✅ Gửi thành công!"))
-          .catch((err) => alert("❌ Lỗi: " + JSON.stringify(err)));
+      document.getElementById("contactForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        emailjs.sendForm("service_ntj7u7a", "template_cyv4bxf", "#contactForm").then(
+          () => {
+            alert("Message sent successfully!");
+          },
+          (error) => {
+            alert("Failed to send: " + JSON.stringify(error));
+          }
+        );
       });
     </script>
+    <!-- xOSEf_NpfLI1RmerL -->
   </body>
 </html>
