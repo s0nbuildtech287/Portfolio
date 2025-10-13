@@ -1,7 +1,101 @@
 // ========== typing animation ================
 var typed = new Typed(".typing", {
-  strings: ["Web Developer", "Software Developer", "a guy with a big love with mew mew"],
+  strings: ["Web Developer", "Software Developer", "guy with a big love with mew mew"],
   typeSpeed: 100,
   BackSpeed: 60,
   loop: true,
 });
+// ========== chuyển mục section ở phần aside =============
+const nav = document.querySelector(".nav"),
+  navList = nav.querySelectorAll("li"),
+  totalNavList = navList.length;
+(allSection = document.querySelectorAll(".section")), (totalSection = allSection.length);
+for (let i = 0; i < totalNavList; i++) {
+  const a = navList[i].querySelector("a");
+  a.addEventListener("click", function () {
+    removeBackSection();
+    for (let j = 0; j < totalNavList; j++) {
+      if (navList[j].querySelector("a").classList.contains("active")) {
+        addBackSection(j);
+        // allSection[j].classList.add("back-section");
+      }
+      navList[j].querySelector("a").classList.remove("active");
+    }
+    this.classList.add("active");
+    showSection(this);
+    if (window.innerWidth < 1200) {
+      asideSectionTogglerBtn();
+    }
+  });
+}
+function removeBackSection() {
+  for (let i = 0; i < totalSection; i++) {
+    allSection[i].classList.remove("back-section");
+  }
+}
+function addBackSection(num) {
+  allSection[num].classList.add("back-section");
+}
+function showSection(element) {
+  for (let i = 0; i < totalSection; i++) {
+    allSection[i].classList.remove("active");
+  }
+  const target = element.getAttribute("href").split("#")[1];
+  document.querySelector("#" + target).classList.add("active");
+}
+// update nav nếu click vào nút hire me ở phần home section và about section thi chuyen ve phan contact
+function updateNav(element) {
+  for (let i = 0; i < totalNavList; i++) {
+    navList[i].querySelector("a").classList.remove("active");
+    const target = element.getAttribute("href").split("#")[1];
+    if (target === navList[i].querySelector("a").getAttribute("href").split("#")[1]) {
+      navList[i].querySelector("a").classList.add("active");
+    }
+  }
+}
+document.querySelector(".hire-me").addEventListener("click", function () {
+  const sectionIndex = this.getAttribute("data-section-index");
+  showSection(this);
+  updateNav(this);
+  removeBackSection();
+  addBackSection(sectionIndex);
+});
+// nut toggler
+const navTogglerBtn = document.querySelector(".nav-toggler"),
+  aside = document.querySelector(".aside");
+navTogglerBtn.addEventListener("click", () => {
+  asideSectionTogglerBtn();
+});
+function asideSectionTogglerBtn() {
+  aside.classList.toggle("open");
+  navTogglerBtn.classList.toggle("open");
+  for (let i = 0; i < totalSection; i++) {
+    allSection[i].classList.toggle("open");
+  }
+}
+// chạy spin của setting
+// script.js
+const toggler = document.querySelector(".style-switcher-toggler");
+const cogIcon = toggler.querySelector(".fa-cog");
+
+toggler.addEventListener("click", function () {
+  cogIcon.classList.toggle("fa-spin"); // Thêm/xóa fa-spin khi click
+});
+// tự động tải cv
+// Thêm sự kiện cho nút Download CV
+document.querySelector(".download-cv").addEventListener("click", function (e) {
+  e.preventDefault(); // Ngăn chặn hành vi mặc định của href
+  showSection(this); // Chuyển đến section contact
+  updateNav(this); // Cập nhật nav
+  removeBackSection();
+  addBackSection(4); // Giả sử contact là section thứ 5 (index 4)
+
+  // Tải file mycv.pdf
+  const link = document.createElement("a");
+  // link.href = "files/BUI_XUAN_SON_CV.pdf"; // Đường dẫn đến file PDF
+  // link.download = "BUI_XUAN_SON_CV.pdf"; // Tên file khi tải về
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link); // Xóa thẻ sau khi tải
+});
+// Nhận tin trong gmail

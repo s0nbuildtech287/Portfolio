@@ -49,18 +49,20 @@
 
       <!-- ====== Main Content Start  ====== -->
       <div class="main-content">
+        <canvas id="starfield"></canvas>
         <!-- ====== Home Section Start  ====== -->
-        <section class="home section" id="home">
+        <section class="home active section" id="home">
           <div class="container">
             <div class="row">
               <div class="home-info padd-15">
                 <h3 class="hello">Hello, my name is <span class="name">Bùi Xuân Sơn</span></h3>
                 <h3 class="my-profession">I'm a <span class="typing">software developer</span></h3>
                 <p>
-                  I'm a software developer with strong passion for technologies and I have two years for this position. My expertise is to develop and maintain web applications with JavaScript,
-                  ReactJS, NodeJS and some other related technologies.
+                  I am a 4th-year IT student with a strong passion for web development, especially in backend. I am eager to learn new technologies, improve my problem-solving skills, and continuously
+                  grow in a professional environment. With adaptability, responsibility, and the ability to work under pressure, I am ready to contribute to team success and commit to long-term
+                  development with the company.
                 </p>
-                <a href="#contact" class="btn hire-me">Hire Me</a>
+                <a href="#contact" class="btn download-cv">Download CV</a>
               </div>
               <div class="home-img">
                 <img src="images/hero.jpg" alt="" />
@@ -81,11 +83,8 @@
               <div class="about-content padd-15">
                 <div class="row">
                   <div class="about-text padd-15">
-                    <h3>I'm Bui Xuan Son and <span>Software Developer </span></h3>
-                    <p>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum qui vel, sapiente, consequatur nostrum amet fugit architecto facilis dolor laudantium ipsam repellat! Magni beatae
-                      architecto velit libero unde accusantium totam.
-                    </p>
+                    <h3>Hi, I'm Xuan Son and I am a<span>Software Developer </span></h3>
+                    <p>Below is some information about myself and some basic tech skills I have.</p>
                   </div>
                 </div>
                 <div class="row">
@@ -104,22 +103,21 @@
                         <p>Email : <span>buixu4ns0n@gmail.com</span></p>
                       </div>
                       <div class="info-item padd-15">
-                        <p>Degree : <span>Expertise</span></p>
+                        <p>Degree : <span>B.S. in Information Systems</span></p>
                       </div>
                       <div class="info-item padd-15">
-                        <p>Phone : <span>086 609 7785</span></p>
+                        <p>Phone : <span>086.609.7785</span></p>
                       </div>
                       <div class="info-item padd-15">
                         <p>City : <span>Ha Noi</span></p>
                       </div>
                       <div class="info-item padd-15">
-                        <p>Freelance : <span>Avaible</span></p>
+                        <p>Freelance : <span>Freelance Available</span></p>
                       </div>
                     </div>
                     <div class="row">
                       <div class="buttons padd-15">
-                        <a href="#" class="btn"> Download CV </a>
-                        <a href="#" class="btn hire-me"> Hire me</a>
+                        <a href="#contact" data-section-index="1" class="btn hire-me"> Hire me</a>
                       </div>
                     </div>
                   </div>
@@ -172,31 +170,34 @@
                           <!-- timeline item -->
                           <div class="timeline-item">
                             <div class="circle-dot"></div>
-                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> 2022 - 2026</h3>
-                            <h4 class="timeline-title">Master in Infomation System</h4>
+                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> 2019 - 2022</h3>
+                            <h4 class="timeline-title">High School Diploma - Quang Trung High School, Ha Dong</h4>
                             <p class="timeline-text">
-                              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque dicta iusto dignissimos necessitatibus libero impedit enim cupiditate est culpa incidunt autem
-                              laudantium, possimus ea similique atque dolor optio pariatur natus?
+                              During my time at Quang Trung High School, I focused on building a strong foundation in information technology and participated in various academic activities. I achieved
+                              second place in the school-level informatics competition, which sparked my interest in programming and problem-solving skills.
                             </p>
                           </div>
                           <!-- timeline item -->
                           <div class="timeline-item">
                             <div class="circle-dot"></div>
-                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> 2022 - 2026</h3>
-                            <h4 class="timeline-title">Master in Infomation System</h4>
+                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> 2023 - 2024</h3>
+                            <h4 class="timeline-title">Outstanding Scholarship - Semester 1, Thuy Loi University</h4>
                             <p class="timeline-text">
-                              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque dicta iusto dignissimos necessitatibus libero impedit enim cupiditate est culpa incidunt autem
-                              laudantium, possimus ea similique atque dolor optio pariatur natus?
+                              In my second year at Thuy Loi University, majoring in Information Systems, I earned an outstanding scholarship for Semester 1 with a perfect GPA of 4.0. I excelled in key
+                              subjects such as Object-Oriented Programming (OOP), Web Technology, Web Foundations, and Database Systems, achieving A grades in all, which strengthened my technical
+                              skills in software development and data management.
                             </p>
                           </div>
                           <!-- timeline item -->
                           <div class="timeline-item">
                             <div class="circle-dot"></div>
-                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> 2022 - 2026</h3>
-                            <h4 class="timeline-title">Master in Infomation System</h4>
+                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> 2024 - 2025</h3>
+                            <h4 class="timeline-title">Outstanding Scholarship - Semester 2, Thuy Loi University</h4>
                             <p class="timeline-text">
-                              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque dicta iusto dignissimos necessitatibus libero impedit enim cupiditate est culpa incidunt autem
-                              laudantium, possimus ea similique atque dolor optio pariatur natus?
+                              Continuing my studies at Thuy Loi University in Information Systems, I received another outstanding scholarship for Semester 2 with a GPA of 3.6. This period involved
+                              advanced coursework in areas like software engineering, network security, and project management, where I applied practical skills through group projects and hands-on
+                              labs. Despite a challenging curriculum, I maintained high performance, contributed to team assignments, and gained deeper insights into full-stack development, preparing
+                              me for real-world applications in backend and frontend technologies.
                             </p>
                           </div>
                         </div>
@@ -211,31 +212,34 @@
                           <!-- timeline item -->
                           <div class="timeline-item">
                             <div class="circle-dot"></div>
-                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> 2022 - 2026</h3>
-                            <h4 class="timeline-title">Master in Infomation System</h4>
+                            <h3 class="timeline-date"><i class="fa fa-calendar"></i>Feb 2022 - Mar 2023</h3>
+                            <h4 class="timeline-title">Freelance Projects - Dormitory Management, Tech Store, Student Management</h4>
                             <p class="timeline-text">
-                              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque dicta iusto dignissimos necessitatibus libero impedit enim cupiditate est culpa incidunt autem
-                              laudantium, possimus ea similique atque dolor optio pariatur natus?
+                              Worked on multiple freelance projects including a dormitory management system, a tech store platform, and a student management application. Utilized PHP with Laravel and
+                              ExpressJS for backend development, while the frontend was built with HTML, CSS, and Bootstrap. Occasionally integrated React for dynamic components, enhancing user
+                              interaction and interface design.
                             </p>
                           </div>
                           <!-- timeline item -->
                           <div class="timeline-item">
                             <div class="circle-dot"></div>
-                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> 2022 - 2026</h3>
-                            <h4 class="timeline-title">Master in Infomation System</h4>
+                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> 2023 - 2024</h3>
+                            <h4 class="timeline-title">Data Classification and Clustering Projectm</h4>
                             <p class="timeline-text">
-                              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque dicta iusto dignissimos necessitatibus libero impedit enim cupiditate est culpa incidunt autem
-                              laudantium, possimus ea similique atque dolor optio pariatur natus?
+                              Participated in a personal project focused on data classification and clustering, involving the training of machine learning models. Explored algorithms such as K-Means,
+                              Hierarchical Clustering, and Support Vector Machines (SVM) to analyze datasets, with implementation in Python using libraries like Scikit-learn and TensorFlow. The
+                              project aimed to optimize data segmentation for predictive analytics, improving my skills in data preprocessing, model evaluation, and visualization.
                             </p>
                           </div>
                           <!-- timeline item -->
                           <div class="timeline-item">
                             <div class="circle-dot"></div>
-                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> 2022 - 2026</h3>
-                            <h4 class="timeline-title">Master in Infomation System</h4>
+                            <h3 class="timeline-date"><i class="fa fa-calendar"></i> Jan 2025 - May 2025</h3>
+                            <h4 class="timeline-title">Backend Developer Intern - TCOM Corporation</h4>
                             <p class="timeline-text">
-                              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque dicta iusto dignissimos necessitatibus libero impedit enim cupiditate est culpa incidunt autem
-                              laudantium, possimus ea similique atque dolor optio pariatur natus?
+                              Completed a 5-month internship as a Backend Developer at TCOM Corporation, contributing to two projects: Motoya (a Japanese second-hand goods trading platform) and
+                              Flamigo (a travel company website). Developed CRUD APIs using NodeJS and ExpressJS, implemented client feedback to refine features, and ensured robust backend
+                              functionality. Collaborated with the team to meet project deadlines and improve system performance.
                             </p>
                           </div>
                         </div>
@@ -261,12 +265,12 @@
               <div class="service-item padd-15">
                 <div class="service-item-inner">
                   <div class="icon">
-                    <i class="fa fa-mobile-alt"></i>
+                    <i class="fa fa-solid fa-code"></i>
                   </div>
-                  <h4>Web Design</h4>
+                  <h4>Frontend Development</h4>
                   <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, quibusdam iusto? Veritatis nostrum illo facilis alias adipisci quaerat inventore atque aperiam dolore? Dolores, esse.
-                    Tenetur itaque ea quasi natus at.
+                    Crafting responsive, user-friendly, and visually appealing interfaces using modern web technologies. Skilled in HTML, CSS, JavaScript, React, Next and UI frameworks to deliver
+                    seamless user experiences across all devices.
                   </p>
                 </div>
               </div>
@@ -275,12 +279,12 @@
               <div class="service-item padd-15">
                 <div class="service-item-inner">
                   <div class="icon">
-                    <i class="fa fa-laptop-code"></i>
+                    <i class="fa fa-solid fa-server"></i>
                   </div>
-                  <h4>Web Design</h4>
+                  <h4>Backend Development</h4>
                   <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, quibusdam iusto? Veritatis nostrum illo facilis alias adipisci quaerat inventore atque aperiam dolore? Dolores, esse.
-                    Tenetur itaque ea quasi natus at.
+                    Building secure and efficient server-side systems. Experienced in PHP (Laravel), Node with Express and Nest and Java to design APIs, manage databases, and ensure system stability
+                    and scalability.
                   </p>
                 </div>
               </div>
@@ -289,12 +293,22 @@
               <div class="service-item padd-15">
                 <div class="service-item-inner">
                   <div class="icon">
-                    <i class="fa fa-palette"></i>
+                    <i class="fa fa-solid fa-palette"></i>
                   </div>
-                  <h4>Web Design</h4>
+                  <h4>UI/UX Design</h4>
+                  <p>Designing intuitive layouts and prototypes with Figma and Canva. Focus on clean, consistent, and user-centered design principles to enhance usability and brand identity.</p>
+                </div>
+              </div>
+              <!-- Service item end -->
+              <!-- Service item start -->
+              <div class="service-item padd-15">
+                <div class="service-item-inner">
+                  <div class="icon">
+                    <i class="fa fa-solid fa-cubes"></i>
+                  </div>
+                  <h4>Software Development</h4>
                   <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, quibusdam iusto? Veritatis nostrum illo facilis alias adipisci quaerat inventore atque aperiam dolore? Dolores, esse.
-                    Tenetur itaque ea quasi natus at.
+                    Developing tailored software solutions with an emphasis on functionality, maintainability, and performance. Able to translate business requirements into effective digital products.
                   </p>
                 </div>
               </div>
@@ -303,13 +317,10 @@
               <div class="service-item padd-15">
                 <div class="service-item-inner">
                   <div class="icon">
-                    <i class="fa fa-code"></i>
+                    <i class="fa fa-solid fa-file-word"></i>
                   </div>
-                  <h4>Web Design</h4>
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, quibusdam iusto? Veritatis nostrum illo facilis alias adipisci quaerat inventore atque aperiam dolore? Dolores, esse.
-                    Tenetur itaque ea quasi natus at.
-                  </p>
+                  <h4>Presentation & Productivity Toolsn</h4>
+                  <p>Proficient in PowerPoint, Word, Excel, and Canva for creating professional presentations and reports that effectively communicate ideas and data.</p>
                 </div>
               </div>
               <!-- Service item end -->
@@ -317,27 +328,10 @@
               <div class="service-item padd-15">
                 <div class="service-item-inner">
                   <div class="icon">
-                    <i class="fa fa-search"></i>
+                    <i class="fa fa-solid fa-chart-line"></i>
                   </div>
-                  <h4>Web Design</h4>
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, quibusdam iusto? Veritatis nostrum illo facilis alias adipisci quaerat inventore atque aperiam dolore? Dolores, esse.
-                    Tenetur itaque ea quasi natus at.
-                  </p>
-                </div>
-              </div>
-              <!-- Service item end -->
-              <!-- Service item start -->
-              <div class="service-item padd-15">
-                <div class="service-item-inner">
-                  <div class="icon">
-                    <i class="fa fa-bullhorn"></i>
-                  </div>
-                  <h4>Web Design</h4>
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, quibusdam iusto? Veritatis nostrum illo facilis alias adipisci quaerat inventore atque aperiam dolore? Dolores, esse.
-                    Tenetur itaque ea quasi natus at.
-                  </p>
+                  <h4>Data Analysis</h4>
+                  <p>Collecting, cleaning, and analyzing data to extract meaningful insights. Skilled in using tools like SQL and visualization platforms to support data-driven decision making.</p>
                 </div>
               </div>
               <!-- Service item end -->
@@ -363,7 +357,7 @@
               <div class="portfolio-item padd-15">
                 <div class="portfolio-item-inner shadow-dark">
                   <div class="portfolio-img">
-                    <img src="images/portfolio/portfolio-1.jpg" alt="" />
+                    <img src="images/portfolio/project-1.jpg" alt="" />
                   </div>
                 </div>
               </div>
@@ -372,7 +366,7 @@
               <div class="portfolio-item padd-15">
                 <div class="portfolio-item-inner shadow-dark">
                   <div class="portfolio-img">
-                    <img src="images/portfolio/portfolio-1.jpg" alt="" />
+                    <img src="images/portfolio/project-2.jpg" alt="" />
                   </div>
                 </div>
               </div>
@@ -381,7 +375,7 @@
               <div class="portfolio-item padd-15">
                 <div class="portfolio-item-inner shadow-dark">
                   <div class="portfolio-img">
-                    <img src="images/portfolio/portfolio-1.jpg" alt="" />
+                    <img src="images/portfolio/project-3.jpg" alt="" />
                   </div>
                 </div>
               </div>
@@ -390,7 +384,7 @@
               <div class="portfolio-item padd-15">
                 <div class="portfolio-item-inner shadow-dark">
                   <div class="portfolio-img">
-                    <img src="images/portfolio/portfolio-1.jpg" alt="" />
+                    <img src="images/portfolio/project-4.png" alt="" />
                   </div>
                 </div>
               </div>
@@ -399,7 +393,7 @@
               <div class="portfolio-item padd-15">
                 <div class="portfolio-item-inner shadow-dark">
                   <div class="portfolio-img">
-                    <img src="images/portfolio/portfolio-1.jpg" alt="" />
+                    <img src="images/portfolio/project-5.jpg" alt="" />
                   </div>
                 </div>
               </div>
@@ -408,7 +402,7 @@
               <div class="portfolio-item padd-15">
                 <div class="portfolio-item-inner shadow-dark">
                   <div class="portfolio-img">
-                    <img src="images/portfolio/portfolio-1.jpg" alt="" />
+                    <img src="images/portfolio/project-6.png" alt="" />
                   </div>
                 </div>
               </div>
@@ -469,17 +463,15 @@
             <h4 class="contact-sub-title padd-15">I'M VERY REPOSIVE TO MESSAGES</h4>
             <!-- Contact Form -->
             <div class="row">
-              <div class="contact-form padd-15">
+              <div class="contact-form padd-15" id="contactForm">
                 <div class="row">
                   <div class="form-item col-6 padd-15">
                     <div class="form-group">
-                      <input type="text" class="form-control" placeholder="Your Name" />
+                      <input type="text" class="form-control" placeholder="Your Name" name="from_name" />
                     </div>
                   </div>
                   <div class="form-item col-6 padd-15">
-                    <div class="form-group">
-                      <input type="email" class="form-control" placeholder="Email" />
-                    </div>
+                    <div class="form-group"><input type="email" class="form-control" placeholder="Email" name="reply_to" /></div>
                   </div>
                 </div>
                 <div class="row">
@@ -492,13 +484,13 @@
                 <div class="row">
                   <div class="form-item col-12 padd-15">
                     <div class="form-group">
-                      <textarea name="" class="form-control" id="" placeholder="Message"></textarea>
+                      <textarea name="message" class="form-control" id="" placeholder="Message"></textarea>
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="form-item col-12 padd-15">
-                    <button type="submit" class="btn">Send Message</button>
+                    <button type="submit" class="btn" id="btnSend">Send Message</button>
                   </div>
                 </div>
               </div>
@@ -537,5 +529,26 @@
     ></script>
     <script src="js/script.js"></script>
     <script src="js/style-switcher.js"></script>
+    <script src="js/star.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+      (function () {
+        emailjs.init("xOSEf_NpfLI1RmerL"); // Thay bằng public key thật
+      })();
+      document.getElementById("btnSend").addEventListener("click", function () {
+        const name = document.querySelector('input[name="from_name"]').value;
+        const email = document.querySelector('input[name="reply_to"]').value;
+        const message = document.querySelector('textarea[name="message"]').value;
+
+        emailjs
+          .send("service_ntj7u7a", "template_cyv4bxf", {
+            from_name: name,
+            reply_to: email,
+            message: message,
+          })
+          .then(() => alert("✅ Gửi thành công!"))
+          .catch((err) => alert("❌ Lỗi: " + JSON.stringify(err)));
+      });
+    </script>
   </body>
 </html>

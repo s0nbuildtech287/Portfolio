@@ -34,11 +34,38 @@ ul {
   list-style: none;
 }
 .section {
-  background: var(--bg-black-900);
+  /* background: var(--bg-black-900); */
+  background: transparent;
   min-height: 100vh;
   display: block;
   padding: 0 30px;
   opacity: 1;
+  /* position: fixed; */
+  position: relative;
+  /* left: 270px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0; */
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: all 0.3s ease;
+}
+.section.back-section {
+  z-index: 1;
+}
+.section.active {
+  z-index: 2;
+  opacity: 1;
+  animation: slideSection 1s ease;
+}
+@keyframes slideSection {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
 }
 .hidden {
   display: none !important;
@@ -128,6 +155,7 @@ ul {
   justify-content: center;
   align-items: center;
   z-index: 10;
+  transition: all 0.3s ease;
 }
 .aside .logo {
   position: absolute;
@@ -180,12 +208,17 @@ ul {
   display: none;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
 }
 .aside .nav-toggler span {
   height: 2px;
   width: 18px;
   background: var(--skin-color);
   display: inline-block;
+  position: relative;
+}
+.aside .nav-toggler.open span {
+  background-color: transparent;
 }
 .aside .nav-toggler span::before {
   content: "";
@@ -193,7 +226,12 @@ ul {
   width: 18px;
   background: var(--skin-color);
   position: absolute;
-  transform: translateY(-6px);
+  top: -6px;
+  left: 0;
+}
+.aside .nav-toggler.open span::before {
+  transform: rotate(45deg);
+  top: 0;
 }
 .aside .nav-toggler span::after {
   content: "";
@@ -201,7 +239,12 @@ ul {
   width: 18px;
   background: var(--skin-color);
   position: absolute;
-  transform: translateY(6px);
+  top: 6px;
+  left: 0;
+}
+.aside .nav-toggler.open span::after {
+  transform: rotate(-45deg);
+  top: 0;
 }
 .aside .nav {
   margin-top: 50px;
@@ -336,7 +379,6 @@ h3.my-profession {
   margin-top: 30px;
 }
 .about .about-content .personal-info .buttons .btn {
-  margin-right: 15px;
   margin-top: 10px;
 }
 .about .about-content .skills {
@@ -534,6 +576,7 @@ h3.my-profession {
 }
 .portfolio .portfolio-item-inner .portfolio-img img {
   width: 100%;
+  height: 200px;
   display: block;
 }
 /* ====== Contact ====== */
@@ -613,11 +656,27 @@ h3.my-profession {
 }
 /* ====== Responsive ====== */
 @media (max-width: 1199px) {
+  .section .container {
+    padding-top: 70px;
+  }
   .aside {
     left: -270px;
   }
-  .main-content {
-    padding-left: 0;
+  .aside.open {
+    left: 0;
+  }
+  .aside .nav-toggler {
+    display: flex;
+    left: 30px;
+  }
+  .aside .nav-toggler.open {
+    left: 300px;
+  }
+  .section {
+    left: 0;
+  }
+  .section.open {
+    left: 270px;
   }
   .about .about-content .personal-info .info-item p span {
     display: block;
@@ -650,5 +709,60 @@ h3.my-profession {
   .about .about-content .personal-info {
     flex: 0 0 100%;
     max-width: 100%;
+  }
+}
+/* background star */
+/* Đặt nền sao nằm trọn trong main-content */
+.main-content {
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+  background: radial-gradient(ellipse at bottom, #0d1b2a 0%, #000000 100%); /* Đặt nền gradient cho main-content */
+}
+/* Canvas của sao */
+#starfield {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1; /* Nằm dưới nội dung */
+  background: transparent;
+  pointer-events: none; /* Tránh chặn click các phần tử khác */
+}
+/* Switcher */
+/* style.css */
+.style-switcher-toggler {
+  cursor: pointer;
+  transition: all 0.3s ease; /* Thêm hiệu ứng mượt khi hover */
+}
+
+.style-switcher-toggler .fa-cog {
+  font-size: 20px; /* Đảm bảo icon đủ lớn để thấy animation */
+  animation: fa-spin 2s infinite linear; /* Xác định rõ animation */
+}
+
+/* Đảm bảo không bị ẩn */
+.style-switcher {
+  position: fixed; /* Giả sử vị trí cố định, điều chỉnh nếu cần */
+  top: 20px;
+  right: 20px;
+  z-index: 1000; /* Đặt cao để hiển thị trên các phần tử khác */
+}
+/* style.css */
+.style-switcher-toggler .fa-cog {
+  transition: all 0.3s ease;
+}
+
+.style-switcher-toggler:hover .fa-cog {
+  animation: fa-spin 2s infinite linear; /* Quay khi hover */
+}
+@keyframes fa-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
