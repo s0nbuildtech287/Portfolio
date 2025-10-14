@@ -766,3 +766,40 @@ h3.my-profession {
     transform: rotate(360deg);
   }
 }
+
+/* fix responsive mobile */
+/* ===== Responsive ===== */
+@media (max-width: 991px) {
+  .aside {
+    left: -270px;
+    transition: all 0.3s ease;
+  }
+
+  .aside.open {
+    left: 0;
+  }
+
+  .main-container {
+    padding-left: 0;
+  }
+
+  .nav-toggler {
+    display: block;
+    position: fixed;
+    left: 20px;
+    top: 20px;
+    background: var(--skin-color);
+    color: #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    cursor: pointer;
+    z-index: 1000;
+  }
+
+  .nav-toggler span {
+    display: none;
+  }
+}

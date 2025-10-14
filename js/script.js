@@ -99,3 +99,5 @@ document.querySelector(".download-cv").addEventListener("click", function (e) {
   document.body.removeChild(link); // Xóa thẻ sau khi tải
 });
 // Nhận tin trong gmail
+
+// fixx responsive
