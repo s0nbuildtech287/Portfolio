@@ -803,3 +803,10 @@ h3.my-profession {
     display: none;
   }
 }
+/* fix màn sao vs chuyển sáng tối */
+body.dark .main-content {
+  background: radial-gradient(ellipse at bottom, #0d1b2a 0%, #000000 100%);
+}
+body:not(.dark) .main-content {
+  background: var(--bg-black-900);
+}
