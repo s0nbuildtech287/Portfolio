@@ -11,12 +11,21 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
   const [inputPass, setInputPass] = useState("");
   const [passError, setPassError] = useState("");
 
-  // States cho Form Thêm Dự Án (3 trường)
+  // States cho Form Thêm Dự Án
+  const [imageType, setImageType] = useState("file"); // "file" hoặc "url"
   const [image, setImage] = useState("");
   const [purpose, setPurpose] = useState("");
   const [deployUrl, setDeployUrl] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
 
-  // Load dự án đã lưu từ localStorage
+  // States duy nhất cho Upload file README (.md / .txt)
+  const [readmeFileName, setReadmeFileName] = useState("");
+  const [readmeContent, setReadmeContent] = useState("");
+
+  // State cho Viewer xem chi tiết README Popup
+  const [activeReadmeProject, setActiveReadmeProject] = useState(null);
+
+  // Load dự án đã lưu từ localStorage khi vừa vào ứng dụng
   useEffect(() => {
     const savedProjects = localStorage.getItem("portfolio_user_projects");
     if (savedProjects) {
@@ -28,7 +37,36 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     }
   }, []);
 
-  // Xử lý mở Modal (Check nếu chưa Auth thì bắt nhập mật khẩu)
+  // Xử lý khi chọn file ảnh từ máy tính (Convert sang Base64)
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Dung lượng file ảnh quá lớn (vui lòng chọn file nhỏ hơn 5MB)!");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result); // Base64 Data URL
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Xử lý khi Upload file README (.md hoặc .txt) từ máy tính
+  const handleReadmeFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setReadmeFileName(file.name);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setReadmeContent(reader.result); // Chuỗi văn bản nội dung file README
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  // Xử lý mở Modal Admin
   const handleOpenAddModal = () => {
     setInputPass("");
     setPassError("");
@@ -46,7 +84,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     }
   };
 
-  // Xử lý Thêm dự án mới sau khi đã Auth
+  // Xử lý Thêm dự án mới
   const handleAddProject = (e) => {
     e.preventDefault();
 
@@ -59,7 +97,10 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
       id: Date.now(),
       image: image.trim() || "images/portfolio/project-1.jpg",
       purpose: purpose.trim(),
-      deployUrl: deployUrl.trim() || "#"
+      deployUrl: deployUrl.trim() || "#",
+      githubUrl: githubUrl.trim() || "#",
+      readmeFileName: readmeFileName,
+      readmeContent: readmeContent
     };
 
     const updatedProjects = [...projects, newProject];
@@ -70,10 +111,13 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     setImage("");
     setPurpose("");
     setDeployUrl("");
+    setGithubUrl("");
+    setReadmeFileName("");
+    setReadmeContent("");
     setShowModal(false);
   };
 
-  // Xóa dự án (Yêu cầu nhập mật khẩu xác nhận nếu chưa Auth)
+  // Xóa dự án
   const handleDeleteProject = (id) => {
     if (!isAuthenticated) {
       const pass = prompt("Nhập mật khẩu Admin để xóa dự án:");
@@ -177,7 +221,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                     position: "relative",
                     display: "flex",
                     flexDirection: "column",
-                    height: "250px",
+                    height: "270px",
                     overflow: "hidden"
                   }}
                 >
@@ -194,25 +238,49 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                     />
                   </div>
 
-                  {/* Nội dung Mục đích & Link Deploy */}
+                  {/* Nội dung Mục đích & Links */}
                   <div style={{ padding: "12px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                     <p style={{ fontSize: "14px", color: "var(--text-black-900)", fontWeight: "500", lineHeight: "1.4", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
                       {proj.purpose}
                     </p>
 
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
-                      {proj.deployUrl && proj.deployUrl !== "#" ? (
-                        <a
-                          href={proj.deployUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ fontSize: "13px", color: "var(--skin-color)", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}
-                        >
-                          <i className="fa fa-external-link-alt"></i> Deploy Link
-                        </a>
-                      ) : (
-                        <span style={{ fontSize: "13px", color: "var(--text-black-700)" }}>Chưa deploy</span>
-                      )}
+                      <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                        {proj.githubUrl && proj.githubUrl !== "#" && (
+                          <a
+                            href={proj.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ fontSize: "12px", color: "var(--text-black-900)", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                            title="Mã nguồn GitHub"
+                          >
+                            <i className="fa-brands fa-github" style={{ fontSize: "14px" }}></i> GitHub
+                          </a>
+                        )}
+
+                        {/* Nút Xem README (Mở Popup xem nội dung file README đã upload) */}
+                        {proj.readmeContent && (
+                          <button
+                            onClick={() => setActiveReadmeProject(proj)}
+                            style={{ background: "none", border: "none", padding: 0, fontSize: "12px", color: "var(--text-black-900)", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                            title="Xem README chi tiết"
+                          >
+                            <i className="fa fa-book-open" style={{ fontSize: "12px", color: "var(--skin-color)" }}></i> README
+                          </button>
+                        )}
+
+                        {proj.deployUrl && proj.deployUrl !== "#" && (
+                          <a
+                            href={proj.deployUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ fontSize: "12px", color: "var(--skin-color)", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                            title="Xem Demo / Deploy"
+                          >
+                            <i className="fa fa-external-link-alt"></i> Deploy
+                          </a>
+                        )}
+                      </div>
 
                       <button
                         onClick={() => handleDeleteProject(proj.id)}
@@ -229,6 +297,70 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
           )}
         </div>
       </div>
+
+      {/* Modal Popup Xem Nội Dung File README Chi Tiết */}
+      {activeReadmeProject && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.8)",
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px"
+          }}
+          onClick={() => setActiveReadmeProject(null)}
+        >
+          <div
+            style={{
+              backgroundColor: "var(--bg-black-100)",
+              border: "1px solid var(--bg-black-50)",
+              borderRadius: "15px",
+              maxWidth: "650px",
+              width: "100%",
+              padding: "25px",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+              maxHeight: "85vh",
+              display: "flex",
+              flexDirection: "column"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", borderBottom: "1px solid var(--bg-black-50)", paddingBottom: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <i className="fa fa-book-open" style={{ fontSize: "18px", color: "var(--skin-color)" }}></i>
+                <h3 style={{ fontSize: "18px", color: "var(--text-black-900)", fontWeight: "700", margin: 0 }}>
+                  {activeReadmeProject.readmeFileName || "README.md"} - Chi Tiết Dự Án
+                </h3>
+              </div>
+              <button
+                onClick={() => setActiveReadmeProject(null)}
+                style={{ background: "none", border: "none", color: "var(--text-black-900)", fontSize: "18px", cursor: "pointer" }}
+              >
+                <i className="fa fa-times"></i>
+              </button>
+            </div>
+
+            <div style={{ flex: 1, overflowY: "auto", padding: "10px", backgroundColor: "var(--bg-black-900)", borderRadius: "8px", border: "1px solid var(--bg-black-50)" }}>
+              <pre style={{ whiteSpace: "pre-wrap", fontFamily: "monospace", fontSize: "14px", color: "var(--text-black-900)", margin: 0, lineHeight: "1.6" }}>
+                {activeReadmeProject.readmeContent}
+              </pre>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "15px" }}>
+              <button
+                onClick={() => setActiveReadmeProject(null)}
+                className="btn"
+                style={{ padding: "8px 22px" }}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal Admin (Xác thực mật khẩu -> Form Thêm Dự Án) */}
       {showModal && (
@@ -250,11 +382,13 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
               backgroundColor: "var(--bg-black-100)",
               border: "1px solid var(--bg-black-50)",
               borderRadius: "15px",
-              maxWidth: "480px",
+              maxWidth: "500px",
               width: "100%",
               padding: "25px",
               boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-              position: "relative"
+              position: "relative",
+              maxHeight: "90vh",
+              overflowY: "auto"
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -310,22 +444,80 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                 </div>
               </form>
             ) : (
-              /* Bước 2: Form Nhập Dự Án 3 Trường */
+              /* Bước 2: Form Nhập Dự Án */
               <form onSubmit={handleAddProject}>
+                {/* Trường 1: Ảnh Dự Án */}
                 <div className="form-group" style={{ marginBottom: "15px" }}>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
-                    1. Ảnh Dự Án (Link URL ảnh hoặc đường dẫn file)
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "8px" }}>
+                    1. Ảnh Dự Án (Upload file hoặc dán Link URL)
                   </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="https://example.com/image.jpg hoặc images/portfolio/project-1.jpg"
-                    value={image}
-                    onChange={(e) => setImage(e.target.value)}
-                    style={{ width: "100%", height: "42px", borderRadius: "8px", border: "1px solid var(--bg-black-50)", padding: "0 12px", background: "var(--bg-black-900)", color: "var(--text-black-900)" }}
-                  />
+
+                  <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+                    <button
+                      type="button"
+                      onClick={() => { setImageType("file"); setImage(""); }}
+                      style={{
+                        flex: 1,
+                        padding: "6px 10px",
+                        fontSize: "13px",
+                        borderRadius: "6px",
+                        border: "1px solid var(--skin-color)",
+                        backgroundColor: imageType === "file" ? "var(--skin-color)" : "transparent",
+                        color: imageType === "file" ? "#fff" : "var(--text-black-900)",
+                        cursor: "pointer"
+                      }}
+                    >
+                      <i className="fa fa-upload"></i> Upload từ máy tính
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setImageType("url"); setImage(""); }}
+                      style={{
+                        flex: 1,
+                        padding: "6px 10px",
+                        fontSize: "13px",
+                        borderRadius: "6px",
+                        border: "1px solid var(--skin-color)",
+                        backgroundColor: imageType === "url" ? "var(--skin-color)" : "transparent",
+                        color: imageType === "url" ? "#fff" : "var(--text-black-900)",
+                        cursor: "pointer"
+                      }}
+                    >
+                      <i className="fa fa-link"></i> Dán Link URL ảnh
+                    </button>
+                  </div>
+
+                  {imageType === "file" ? (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid var(--bg-black-50)", background: "var(--bg-black-900)", color: "var(--text-black-900)" }}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="https://example.com/image.jpg"
+                      value={image}
+                      onChange={(e) => setImage(e.target.value)}
+                      style={{ width: "100%", height: "42px", borderRadius: "8px", border: "1px solid var(--bg-black-50)", padding: "0 12px", background: "var(--bg-black-900)", color: "var(--text-black-900)" }}
+                    />
+                  )}
+
+                  {image && (
+                    <div style={{ marginTop: "10px", textAlign: "center" }}>
+                      <p style={{ fontSize: "12px", color: "var(--text-black-700)", marginBottom: "4px" }}>Xem trước ảnh:</p>
+                      <img
+                        src={image}
+                        alt="Preview"
+                        style={{ height: "100px", maxWidth: "100%", objectFit: "cover", borderRadius: "6px", border: "1px solid var(--bg-black-50)" }}
+                      />
+                    </div>
+                  )}
                 </div>
 
+                {/* Trường 2: Mục Đích / Mô Tả */}
                 <div className="form-group" style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
                     2. Mục Đích / Mô Tả Dự Án *
@@ -341,9 +533,10 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   ></textarea>
                 </div>
 
-                <div className="form-group" style={{ marginBottom: "20px" }}>
+                {/* Trường 3: Link Deploy */}
+                <div className="form-group" style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
-                    3. Link Deploy (Vercel / GitHub / Website Link)
+                    3. Link Deploy (Vercel / Website Link)
                   </label>
                   <input
                     type="text"
@@ -353,6 +546,39 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                     onChange={(e) => setDeployUrl(e.target.value)}
                     style={{ width: "100%", height: "42px", borderRadius: "8px", border: "1px solid var(--bg-black-50)", padding: "0 12px", background: "var(--bg-black-900)", color: "var(--text-black-900)" }}
                   />
+                </div>
+
+                {/* Trường 4: Link GitHub */}
+                <div className="form-group" style={{ marginBottom: "15px" }}>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
+                    4. Link GitHub (Source Code Repository)
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="https://github.com/username/project-repo"
+                    value={githubUrl}
+                    onChange={(e) => setGithubUrl(e.target.value)}
+                    style={{ width: "100%", height: "42px", borderRadius: "8px", border: "1px solid var(--bg-black-50)", padding: "0 12px", background: "var(--bg-black-900)", color: "var(--text-black-900)" }}
+                  />
+                </div>
+
+                {/* Trường 5: Upload File README (.md / .txt) duy nhất */}
+                <div className="form-group" style={{ marginBottom: "20px" }}>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "8px" }}>
+                    5. Upload File README (.md / .txt) từ máy tính
+                  </label>
+                  <input
+                    type="file"
+                    accept=".md,.txt"
+                    onChange={handleReadmeFileUpload}
+                    style={{ width: "100%", padding: "8px", borderRadius: "8px", border: "1px solid var(--bg-black-50)", background: "var(--bg-black-900)", color: "var(--text-black-900)" }}
+                  />
+                  {readmeFileName && (
+                    <p style={{ fontSize: "12px", color: "var(--skin-color)", marginTop: "6px", fontWeight: "600" }}>
+                      ✓ Đã tải file: {readmeFileName}
+                    </p>
+                  )}
                 </div>
 
                 <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
