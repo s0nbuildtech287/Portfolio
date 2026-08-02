@@ -17,9 +17,9 @@ const AboutSection = ({ isActive, isBackSection, onNavigateContact }) => {
             <div className="row">
               <div className="about-text padd-15">
                 <h3>
-                  Hi, I'm Xuan Son and I am a<span> Software Developer </span>
+                  Hi, I'm Xuan Son and I am a<span> Fullstack Developer & Data Analyst </span>
                 </h3>
-                <p>Below is some information about myself and some basic tech skills I have.</p>
+                <p>Tôi đã tốt nghiệp Cử nhân Hệ thống Thông tin. Dưới đây là một số thông tin cá nhân và hành trình làm việc chuyên môn của tôi.</p>
               </div>
             </div>
             <div className="row">
@@ -38,7 +38,7 @@ const AboutSection = ({ isActive, isBackSection, onNavigateContact }) => {
                     <p>Email : <span>buixu4ns0n@gmail.com</span></p>
                   </div>
                   <div className="info-item padd-15">
-                    <p>Degree : <span>B.S. in Information Systems</span></p>
+                    <p>Degree : <span>B.S. in Information Systems (Graduated)</span></p>
                   </div>
                   <div className="info-item padd-15">
                     <p>Phone : <span>086.609.7785</span></p>
@@ -47,7 +47,7 @@ const AboutSection = ({ isActive, isBackSection, onNavigateContact }) => {
                     <p>City : <span>Ha Noi</span></p>
                   </div>
                   <div className="info-item padd-15">
-                    <p>Freelance : <span>Freelance Available</span></p>
+                    <p>Freelance : <span>Available for Projects</span></p>
                   </div>
                 </div>
                 <div className="row">
@@ -68,44 +68,45 @@ const AboutSection = ({ isActive, isBackSection, onNavigateContact }) => {
               <div className="skills padd-15">
                 <div className="row">
                   <div className="skill-item padd-15">
-                    <h5>HTML / CSS</h5>
+                    <h5>Fullstack (Node, React, Java, PHP)</h5>
                     <div className="progress">
-                      <div className="progress-in" style={{ width: "76%" }}></div>
-                      <div className="skill-percent">76%</div>
+                      <div className="progress-in" style={{ width: "88%" }}></div>
+                      <div className="skill-percent">88%</div>
                     </div>
                   </div>
                   <div className="skill-item padd-15">
-                    <h5>Bootstrap / Sass</h5>
+                    <h5>Quant Finance Dev</h5>
+                    <div className="progress">
+                      <div className="progress-in" style={{ width: "85%" }}></div>
+                      <div className="skill-percent">85%</div>
+                    </div>
+                  </div>
+                  <div className="skill-item padd-15">
+                    <h5>Data Analysis (SQL, Python)</h5>
+                    <div className="progress">
+                      <div className="progress-in" style={{ width: "85%" }}></div>
+                      <div className="skill-percent">85%</div>
+                    </div>
+                  </div>
+                  <div className="skill-item padd-15">
+                    <h5>AI Engineering Application</h5>
                     <div className="progress">
                       <div className="progress-in" style={{ width: "80%" }}></div>
                       <div className="skill-percent">80%</div>
                     </div>
                   </div>
                   <div className="skill-item padd-15">
-                    <h5>JavaScript / Typescript</h5>
+                    <h5>Mobile (React Native)</h5>
                     <div className="progress">
-                      <div className="progress-in" style={{ width: "90%" }}></div>
-                      <div className="skill-percent">90%</div>
-                    </div>
-                  </div>
-                  <div className="skill-item padd-15">
-                    <h5>Node - ExpressJS / NestTS</h5>
-                    <div className="progress">
-                      <div className="progress-in" style={{ width: "80%" }}></div>
-                      <div className="skill-percent">80%</div>
-                    </div>
-                  </div>
-                  <div className="skill-item padd-15">
-                    <h5>React</h5>
-                    <div className="progress">
-                      <div className="progress-in" style={{ width: "80%" }}></div>
-                      <div className="skill-percent">80%</div>
+                      <div className="progress-in" style={{ width: "75%" }}></div>
+                      <div className="skill-percent">75%</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
             <div className="row">
+              {/* Education Timeline (Từ trước đến nay) */}
               <div className="education padd-15">
                 <h3 className="title">Education</h3>
                 <div className="row">
@@ -116,29 +117,31 @@ const AboutSection = ({ isActive, isBackSection, onNavigateContact }) => {
                         <h3 className="timeline-date"><i className="fa fa-calendar"></i> 2019 - 2022</h3>
                         <h4 className="timeline-title">High School Diploma - Quang Trung High School, Ha Dong</h4>
                         <p className="timeline-text">
-                          During my time at Quang Trung High School, I focused on building a strong foundation in information technology and participated in various academic activities. I achieved second place in the school-level informatics competition, which sparked my interest in programming and problem-solving skills.
+                          Excelled in Mathematics and was selected to compete in the City-Level Mathematics Competition. Demonstrated a strong passion for Information Technology, achieving Second Place in the School-Level Informatics Competition, establishing a strong logical and analytical foundation.
                         </p>
                       </div>
                       <div className="timeline-item">
                         <div className="circle-dot"></div>
-                        <h3 className="timeline-date"><i className="fa fa-calendar"></i> 2023 - 2024</h3>
-                        <h4 className="timeline-title">Outstanding Scholarship - Semester 1, Thuy Loi University</h4>
+                        <h3 className="timeline-date"><i className="fa fa-calendar"></i> 2023 - 2025</h3>
+                        <h4 className="timeline-title">4 Consecutive Outstanding Scholarships - Thuy Loi University</h4>
                         <p className="timeline-text">
-                          In my second year at Thuy Loi University, majoring in Information Systems, I earned an outstanding scholarship for Semester 1 with a perfect GPA of 4.0. I excelled in key subjects such as Object-Oriented Programming (OOP), Web Technology, Web Foundations, and Database Systems, achieving A grades in all, which strengthened my technical skills in software development and data management.
+                          Awarded Outstanding Scholarships for 4 consecutive semesters with top academic standing, including a perfect GPA of 4.0/4.0. Achieved A grades in key core subjects: Object-Oriented Programming (OOP), Web Technology, Database Systems, Software Engineering, and Data Structures.
                         </p>
                       </div>
                       <div className="timeline-item">
                         <div className="circle-dot"></div>
-                        <h3 className="timeline-date"><i className="fa fa-calendar"></i> 2024 - 2025</h3>
-                        <h4 className="timeline-title">Outstanding Scholarship - Semester 2, Thuy Loi University</h4>
+                        <h3 className="timeline-date"><i className="fa fa-calendar"></i> 2025</h3>
+                        <h4 className="timeline-title">Graduated B.S. in Information Systems - Thuy Loi University</h4>
                         <p className="timeline-text">
-                          Continuing my studies at Thuy Loi University in Information Systems, I received another outstanding scholarship for Semester 2 with a GPA of 3.6. This period involved advanced coursework in areas like software engineering, network security, and project management, where I applied practical skills through group projects and hands-on labs. Maintaining high performance, I contributed to team assignments and gained deeper insights into full-stack development.
+                          Successfully graduated with a degree in Information Systems. Gained deep expertise in software engineering, fullstack development, database architecture, quantitative data analytics, and artificial intelligence applications.
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+
+              {/* Experience Timeline (Từ trước đến nay) */}
               <div className="experience padd-15">
                 <h3 className="title">Experience</h3>
                 <div className="row">
@@ -146,18 +149,10 @@ const AboutSection = ({ isActive, isBackSection, onNavigateContact }) => {
                     <div className="timeline shahow-dark">
                       <div className="timeline-item">
                         <div className="circle-dot"></div>
-                        <h3 className="timeline-date"><i className="fa fa-calendar"></i> Feb 2022 - Mar 2023</h3>
-                        <h4 className="timeline-title">Freelance Projects - Dormitory Management, Tech Store, Student Management</h4>
-                        <p className="timeline-text">
-                          Worked on multiple freelance projects including a dormitory management system, a tech store platform, and a student management application. Utilized PHP with Laravel and ExpressJS for backend development, while the frontend was built with HTML, CSS, and Bootstrap. Integrated React for dynamic components.
-                        </p>
-                      </div>
-                      <div className="timeline-item">
-                        <div className="circle-dot"></div>
                         <h3 className="timeline-date"><i className="fa fa-calendar"></i> 2023 - 2024</h3>
-                        <h4 className="timeline-title">Data Classification and Clustering Project</h4>
+                        <h4 className="timeline-title">AI & Machine Learning Projects - University IT Club</h4>
                         <p className="timeline-text">
-                          Participated in a personal project focused on data classification and clustering, involving the training of machine learning models. Explored algorithms such as K-Means, Hierarchical Clustering, and Support Vector Machines (SVM) to analyze datasets using Python, Scikit-learn, and TensorFlow.
+                          Active member of the University IT Club, developing multiple AI & ML projects in data prediction, classification, and clustering. Implemented full end-to-end ML pipelines: data preprocessing, feature engineering, model training, and performance evaluation. Applied key algorithms (K-Means, SVM, Random Forest, Decision Trees, Hierarchical Clustering) using Python, Pandas, NumPy, Scikit-learn, TensorFlow, and Matplotlib.
                         </p>
                       </div>
                       <div className="timeline-item">
@@ -165,7 +160,15 @@ const AboutSection = ({ isActive, isBackSection, onNavigateContact }) => {
                         <h3 className="timeline-date"><i className="fa fa-calendar"></i> Jan 2025 - May 2025</h3>
                         <h4 className="timeline-title">Backend Developer Intern - TCOM Corporation</h4>
                         <p className="timeline-text">
-                          Completed a 5-month internship as a Backend Developer at TCOM Corporation, contributing to two projects: Motoya (a Japanese second-hand goods trading platform) and Flamigo (a travel company website). Developed CRUD APIs using NodeJS and ExpressJS, implemented client feedback, and improved system performance.
+                          Completed a 5-month internship as a Backend Developer at TCOM Corporation, contributing to Motoya (Japanese second-hand goods trading platform) and Flamigo (travel website). Developed RESTful CRUD APIs using Node.js & Express.js.
+                        </p>
+                      </div>
+                      <div className="timeline-item">
+                        <div className="circle-dot"></div>
+                        <h3 className="timeline-date"><i className="fa fa-calendar"></i> July 2025 - Present</h3>
+                        <h4 className="timeline-title">Fullstack Developer & Data Analyst (Quant Finance & AI)</h4>
+                        <p className="timeline-text">
+                          Developing fullstack software systems tailored for Quant Finance, analyzing financial and market data datasets (Data Analyst), and researching & integrating AI Engineering Applications into trading algorithms and business workflows.
                         </p>
                       </div>
                     </div>

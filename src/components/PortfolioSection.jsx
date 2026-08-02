@@ -1,14 +1,5 @@
 import React from "react";
 
-const portfolioImages = [
-  "images/portfolio/project-1.jpg",
-  "images/portfolio/project-2.jpg",
-  "images/portfolio/project-3.jpg",
-  "images/portfolio/project-4.png",
-  "images/portfolio/project-5.jpg",
-  "images/portfolio/project-6.png",
-];
-
 const PortfolioSection = ({ isActive, isBackSection }) => {
   return (
     <section
@@ -27,15 +18,26 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
           </div>
         </div>
         <div className="row">
-          {portfolioImages.map((imgSrc, index) => (
-            <div key={index} className="portfolio-item padd-15">
-              <div className="portfolio-item-inner shadow-dark">
-                <div className="portfolio-img">
-                  <img src={imgSrc} alt={`Project ${index + 1}`} />
-                </div>
-              </div>
+          <div className="padd-15" style={{ flex: "0 0 100%", maxWidth: "100%" }}>
+            <div
+              className="shahow-dark"
+              style={{
+                backgroundColor: "var(--bg-black-100)",
+                border: "1px solid var(--bg-black-50)",
+                borderRadius: "10px",
+                padding: "50px 20px",
+                textAlign: "center"
+              }}
+            >
+              <i className="fa fa-briefcase" style={{ fontSize: "40px", color: "var(--skin-color)", marginBottom: "20px" }}></i>
+              <h3 style={{ fontSize: "22px", color: "var(--text-black-900)", marginBottom: "10px" }}>
+                Dự Án Mới Đang Được Cập Nhật
+              </h3>
+              <p style={{ color: "var(--text-black-700)", fontSize: "16px", maxWidth: "600px", margin: "0 auto" }}>
+                Các dự án thực tế mới về <strong>Quant Finance</strong>, <strong>Data Analysis</strong> và <strong>AI Engineering Application</strong> đang được hoàn thiện và sẽ sớm công bố tại đây.
+              </p>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>

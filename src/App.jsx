@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Aside from "./components/Aside";
 import StarfieldCanvas from "./components/StarfieldCanvas";
 import HomeSection from "./components/HomeSection";
@@ -10,15 +10,36 @@ import StyleSwitcher from "./components/StyleSwitcher";
 
 function App() {
   const [activeSection, setActiveSection] = useState("home");
-  const [backSection, setBackSection] = useState(null);
   const [isNavOpen, setIsNavOpen] = useState(false);
 
-  const sections = ["home", "about", "services", "portfolio", "contact"];
+  // Scroll Spy: Tự động cập nhật Navigator theo vị trí cuộn trang khi cuộn Landing Page
+  useEffect(() => {
+    const handleScroll = () => {
+      const sectionIds = ["home", "about", "services", "portfolio", "contact"];
+      const scrollPosition = window.scrollY + 250;
+
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sectionIds[i]);
+        if (el) {
+          const top = el.offsetTop;
+          if (scrollPosition >= top) {
+            setActiveSection(sectionIds[i]);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleSelectSection = (targetSection) => {
-    if (targetSection === activeSection) return;
-    setBackSection(activeSection);
     setActiveSection(targetSection);
+    const element = document.getElementById(targetSection);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
 
     if (window.innerWidth < 1200) {
       setIsNavOpen(false);
@@ -47,33 +68,28 @@ function App() {
         {/* Home Section */}
         <HomeSection
           isActive={activeSection === "home"}
-          isBackSection={backSection === "home"}
           onNavigateContact={() => handleSelectSection("contact")}
         />
 
         {/* About Section */}
         <AboutSection
           isActive={activeSection === "about"}
-          isBackSection={backSection === "about"}
           onNavigateContact={() => handleSelectSection("contact")}
         />
 
         {/* Services Section */}
         <ServicesSection
           isActive={activeSection === "services"}
-          isBackSection={backSection === "services"}
         />
 
         {/* Portfolio Section */}
         <PortfolioSection
           isActive={activeSection === "portfolio"}
-          isBackSection={backSection === "portfolio"}
         />
 
         {/* Contact Section */}
         <ContactSection
           isActive={activeSection === "contact"}
-          isBackSection={backSection === "contact"}
         />
       </div>
 

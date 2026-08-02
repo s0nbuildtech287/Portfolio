@@ -6,9 +6,14 @@ const HomeSection = ({ isActive, isBackSection, onNavigateContact }) => {
 
   useEffect(() => {
     const typed = new Typed(typingRef.current, {
-      strings: ["Web Developer", "Software Developer", "guy with a big love with mew mew"],
-      typeSpeed: 100,
-      backSpeed: 60,
+      strings: [
+        "Fullstack Developer",
+        "Quant Finance Developer",
+        "Data Analyst",
+        "AI Application Engineer"
+      ],
+      typeSpeed: 80,
+      backSpeed: 50,
       loop: true,
     });
 
@@ -19,14 +24,8 @@ const HomeSection = ({ isActive, isBackSection, onNavigateContact }) => {
 
   const handleDownloadCv = (e) => {
     e.preventDefault();
+    alert("CV hiện đang được cập nhật thông tin định hướng mới (Quant Finance / Fullstack / AI). Vui lòng liên hệ trực tiếp với tôi qua Email hoặc SĐT!");
     onNavigateContact();
-
-    const link = document.createElement("a");
-    link.href = "files/BUI_XUAN_SON_CV.pdf";
-    link.download = "BUI_XUAN_SON_CV.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   return (
@@ -44,15 +43,15 @@ const HomeSection = ({ isActive, isBackSection, onNavigateContact }) => {
               I'm a <span ref={typingRef} className="typing"></span>
             </h3>
             <p>
-              I am a 4th-year IT student with a strong passion for web development, especially in backend. I am eager to learn new technologies, improve my problem-solving skills, and continuously grow in a professional environment. With adaptability, responsibility, and the ability to work under pressure, I am ready to contribute to team success and commit to long-term development with the company.
+              Tôi đã tốt nghiệp Đại học Thủy Lợi (chuyên ngành Hệ thống Thông tin). Hiện tại, tôi tập trung phát triển chuyên sâu với vai trò Fullstack Developer trong lĩnh vực Tài chính định lượng (Quant Finance), kết hợp Phân tích dữ liệu (Data Analyst) và nghiên cứu ứng dụng Trí tuệ nhân tạo (AI Engineering Application). Tôi đam mê giải quyết các bài toán dữ liệu phức tạp và xây dựng các sản phẩm phần mềm hiệu năng cao.
             </p>
-            <a
-              href="#contact"
+            <button
               className="btn download-cv"
               onClick={handleDownloadCv}
+              style={{ cursor: "pointer" }}
             >
               Download CV
-            </a>
+            </button>
           </div>
           <div className="home-img padd-15">
             <img src="images/hero.jpg" alt="Bùi Xuân Sơn" />
