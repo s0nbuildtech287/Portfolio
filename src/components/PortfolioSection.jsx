@@ -257,7 +257,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
         title: title.trim(),
         position: Number(position) || 1,
         rating: Number(rating) || 5,
-        clicks: 0,
+        clicks: Math.floor(Math.random() * 81) + 110,
         image: image.trim() || "images/portfolio/project-1.jpg",
         purpose: purpose.trim(),
         deployUrl: deployUrl.trim() || "#",
