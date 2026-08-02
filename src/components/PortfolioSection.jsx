@@ -6,22 +6,24 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
   const [projects, setProjects] = useState([]);
   const [showModal, setShowModal] = useState(false);
   
-  // State xác thực Admin (Lưu Session để không phải nhập lại mật khẩu nhiều lần)
+  // State xác thực Admin (Lưu Session)
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // States cho Auth
   const [inputPass, setInputPass] = useState("");
   const [passError, setPassError] = useState("");
 
-  // States cho Form Thêm Dự Án (các trường: Ảnh, Mục đích, Link deploy, Upload file README)
+  // States cho Form Thêm Dự Án
   const [imageType, setImageType] = useState("file"); // "file" hoặc "url"
   const [image, setImage] = useState("");
   const [purpose, setPurpose] = useState("");
   const [deployUrl, setDeployUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   // States duy nhất cho Upload file README (.md / .txt)
   const [readmeFileName, setReadmeFileName] = useState("");
   const [readmeContent, setReadmeContent] = useState("");
+  const [readmeUrl, setReadmeUrl] = useState("");
 
   // State cho Viewer xem chi tiết README Popup
   const [activeReadmeProject, setActiveReadmeProject] = useState(null);
@@ -43,30 +45,77 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     }
   }, []);
 
-  // Xử lý khi chọn file ảnh từ máy tính (Convert sang Base64)
-  const handleFileUpload = (e) => {
+  // Xử lý khi chọn file ảnh từ máy tính (Tải & lưu vào ổ cứng images/projects/)
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         alert("Dung lượng file ảnh quá lớn (vui lòng chọn file nhỏ hơn 5MB)!");
         return;
       }
+      setUploading(true);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result); // Base64 Data URL
+      reader.onloadend = async () => {
+        const base64Data = reader.result;
+        try {
+          // Gửi dữ liệu tới API Middleware để ghi file vào thư mục images/projects
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: "image",
+              fileName: file.name,
+              base64Content: base64Data
+            })
+          });
+          const resData = await response.json();
+          if (resData.success) {
+            setImage(resData.url); // Đường dẫn ảnh lưu trên ổ cứng: /images/projects/...
+          } else {
+            setImage(base64Data); // Fallback base64
+          }
+        } catch (err) {
+          console.error("Server upload error:", err);
+          setImage(base64Data); // Fallback base64
+        } finally {
+          setUploading(false);
+        }
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Xử lý khi Upload file README (.md hoặc .txt) từ máy tính
-  const handleReadmeFileUpload = (e) => {
+  // Xử lý khi Upload file README (.md hoặc .txt) từ máy tính (Tải & lưu vào ổ cứng readmee/)
+  const handleReadmeFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setReadmeFileName(file.name);
+      setUploading(true);
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setReadmeContent(reader.result); // Chuỗi văn bản nội dung file README
+      reader.onloadend = async () => {
+        const textData = reader.result;
+        setReadmeContent(textData);
+        setReadmeFileName(file.name);
+
+        try {
+          // Gửi dữ liệu tới API Middleware để ghi file vào thư mục readmee
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: "readme",
+              fileName: file.name,
+              textContent: textData
+            })
+          });
+          const resData = await response.json();
+          if (resData.success) {
+            setReadmeUrl(resData.url); // Đường dẫn file README lưu trên ổ cứng: /readmee/...
+          }
+        } catch (err) {
+          console.error("Server upload error:", err);
+        } finally {
+          setUploading(false);
+        }
       };
       reader.readAsText(file);
     }
@@ -106,7 +155,8 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
       purpose: purpose.trim(),
       deployUrl: deployUrl.trim() || "#",
       readmeFileName: readmeFileName,
-      readmeContent: readmeContent
+      readmeContent: readmeContent,
+      readmeUrl: readmeUrl
     };
 
     const updatedProjects = [...projects, newProject];
@@ -119,6 +169,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     setDeployUrl("");
     setReadmeFileName("");
     setReadmeContent("");
+    setReadmeUrl("");
     setShowModal(false);
   };
 
@@ -272,13 +323,15 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                         )}
                       </div>
 
-                      <button
-                        onClick={() => handleDeleteProject(proj.id)}
-                        style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "14px" }}
-                        title="Xóa dự án"
-                      >
-                        <i className="fa fa-trash"></i>
-                      </button>
+                      {isAuthenticated && (
+                        <button
+                          onClick={() => handleDeleteProject(proj.id)}
+                          style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "14px" }}
+                          title="Xóa dự án"
+                        >
+                          <i className="fa fa-trash"></i>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -439,7 +492,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                 {/* Trường 1: Ảnh Dự Án */}
                 <div className="form-group" style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "8px" }}>
-                    1. Ảnh Dự Án (Upload file hoặc dán Link URL)
+                    1. Ảnh Dự Án (Upload lưu thẳng vào images/projects/)
                   </label>
 
                   <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
@@ -495,9 +548,11 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                     />
                   )}
 
+                  {uploading && <p style={{ fontSize: "12px", color: "var(--skin-color)", marginTop: "4px" }}>Đang lưu file lên máy tính...</p>}
+
                   {image && (
                     <div style={{ marginTop: "10px", textAlign: "center" }}>
-                      <p style={{ fontSize: "12px", color: "var(--text-black-700)", marginBottom: "4px" }}>Xem trước ảnh:</p>
+                      <p style={{ fontSize: "12px", color: "var(--text-black-700)", marginBottom: "4px" }}>Xem trước ảnh (Lưu tại {image}):</p>
                       <img
                         src={image}
                         alt="Preview"
@@ -538,10 +593,10 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   />
                 </div>
 
-                {/* Trường 4: Upload File README (.md / .txt) */}
+                {/* Trường 4: Upload File README (.md / .txt) lưu thẳng vào readmee/ */}
                 <div className="form-group" style={{ marginBottom: "20px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "8px" }}>
-                    4. Upload File README (.md / .txt) từ máy tính
+                    4. Upload File README (.md / .txt) (Lưu thẳng vào readmee/)
                   </label>
                   <input
                     type="file"
@@ -551,7 +606,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   />
                   {readmeFileName && (
                     <p style={{ fontSize: "12px", color: "var(--skin-color)", marginTop: "6px", fontWeight: "600" }}>
-                      ✓ Đã tải file: {readmeFileName}
+                      ✓ Đã lưu file vào thư mục readmee/{readmeFileName}
                     </p>
                   )}
                 </div>
@@ -565,8 +620,8 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   >
                     Hủy
                   </button>
-                  <button type="submit" className="btn" style={{ padding: "8px 22px" }}>
-                    Lưu Dự Án
+                  <button type="submit" className="btn" style={{ padding: "8px 22px" }} disabled={uploading}>
+                    {uploading ? "Đang lưu..." : "Lưu Dự Án"}
                   </button>
                 </div>
               </form>
