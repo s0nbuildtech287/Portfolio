@@ -8,22 +8,56 @@ import PortfolioSection from "./components/PortfolioSection";
 import ContactSection from "./components/ContactSection";
 import StyleSwitcher from "./components/StyleSwitcher";
 
+const SECTION_IDS = ["home", "about", "services", "projects", "contact"];
+
 function App() {
   const [activeSection, setActiveSection] = useState("home");
   const [isNavOpen, setIsNavOpen] = useState(false);
 
-  // Scroll Spy: Tự động cập nhật Navigator theo vị trí cuộn trang khi cuộn Landing Page
+  // 1. Kiểm tra URL Hash khi ứng dụng vừa được tải (direct URL access e.g. /#about)
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "");
+    if (SECTION_IDS.includes(hash)) {
+      setActiveSection(hash);
+      setTimeout(() => {
+        const el = document.getElementById(hash);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 150);
+    }
+  }, []);
+
+  // 2. Lắng nghe sự kiện đổi Hash / nút Back & Forward trên trình duyệt
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (SECTION_IDS.includes(hash)) {
+        setActiveSection(hash);
+        const el = document.getElementById(hash);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  // 3. Scroll Spy: Tự động đồng bộ URL hash & Navigator theo vị trí cuộn trang
   useEffect(() => {
     const handleScroll = () => {
-      const sectionIds = ["home", "about", "services", "projects", "contact"];
       const scrollPosition = window.scrollY + 250;
 
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sectionIds[i]);
+      for (let i = SECTION_IDS.length - 1; i >= 0; i--) {
+        const el = document.getElementById(SECTION_IDS[i]);
         if (el) {
           const top = el.offsetTop;
           if (scrollPosition >= top) {
-            setActiveSection(sectionIds[i]);
+            const currentSection = SECTION_IDS[i];
+            setActiveSection(currentSection);
+            
+            // Cập nhật thanh địa chỉ URL mà không làm nhảy trang
+            if (window.location.hash !== `#${currentSection}`) {
+              window.history.replaceState(null, "", `#${currentSection}`);
+            }
             break;
           }
         }
@@ -34,8 +68,11 @@ function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // 4. Xử lý khi người dùng bấm vào các mục điều hướng Navigator
   const handleSelectSection = (targetSection) => {
     setActiveSection(targetSection);
+    window.history.pushState(null, "", `#${targetSection}`);
+    
     const element = document.getElementById(targetSection);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
@@ -82,9 +119,9 @@ function App() {
           isActive={activeSection === "services"}
         />
 
-        {/* Portfolio Section */}
+        {/* Projects Section */}
         <PortfolioSection
-          isActive={activeSection === "portfolio"}
+          isActive={activeSection === "projects"}
         />
 
         {/* Contact Section */}
