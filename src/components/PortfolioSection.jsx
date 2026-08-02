@@ -5,18 +5,19 @@ const ADMIN_PASSWORD = "Sondeptrai123@k";
 const PortfolioSection = ({ isActive, isBackSection }) => {
   const [projects, setProjects] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  
+  // State xác thực Admin (Lưu Session để không phải nhập lại mật khẩu nhiều lần)
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // States cho Auth
   const [inputPass, setInputPass] = useState("");
   const [passError, setPassError] = useState("");
 
-  // States cho Form Thêm Dự Án
+  // States cho Form Thêm Dự Án (các trường: Ảnh, Mục đích, Link deploy, Upload file README)
   const [imageType, setImageType] = useState("file"); // "file" hoặc "url"
   const [image, setImage] = useState("");
   const [purpose, setPurpose] = useState("");
   const [deployUrl, setDeployUrl] = useState("");
-  const [githubUrl, setGithubUrl] = useState("");
 
   // States duy nhất cho Upload file README (.md / .txt)
   const [readmeFileName, setReadmeFileName] = useState("");
@@ -25,7 +26,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
   // State cho Viewer xem chi tiết README Popup
   const [activeReadmeProject, setActiveReadmeProject] = useState(null);
 
-  // Load dự án đã lưu từ localStorage khi vừa vào ứng dụng
+  // 1. Load dự án đã lưu & Khôi phục Admin Session từ sessionStorage
   useEffect(() => {
     const savedProjects = localStorage.getItem("portfolio_user_projects");
     if (savedProjects) {
@@ -34,6 +35,11 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
       } catch (err) {
         console.error("Failed to parse stored projects:", err);
       }
+    }
+
+    const adminSession = sessionStorage.getItem("portfolio_admin_session");
+    if (adminSession === "true") {
+      setIsAuthenticated(true);
     }
   }, []);
 
@@ -73,11 +79,12 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     setShowModal(true);
   };
 
-  // Xác thực mật khẩu Admin
+  // Xác thực mật khẩu Admin & Lưu Session
   const handleVerifyPassword = (e) => {
     e.preventDefault();
     if (inputPass === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
+      sessionStorage.setItem("portfolio_admin_session", "true");
       setPassError("");
     } else {
       setPassError("Mật khẩu không chính xác!");
@@ -98,7 +105,6 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
       image: image.trim() || "images/portfolio/project-1.jpg",
       purpose: purpose.trim(),
       deployUrl: deployUrl.trim() || "#",
-      githubUrl: githubUrl.trim() || "#",
       readmeFileName: readmeFileName,
       readmeContent: readmeContent
     };
@@ -111,7 +117,6 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     setImage("");
     setPurpose("");
     setDeployUrl("");
-    setGithubUrl("");
     setReadmeFileName("");
     setReadmeContent("");
     setShowModal(false);
@@ -126,6 +131,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
         return;
       }
       setIsAuthenticated(true);
+      sessionStorage.setItem("portfolio_admin_session", "true");
     }
 
     if (window.confirm("Bạn có chắc chắn muốn xóa dự án này?")) {
@@ -155,35 +161,31 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
             {/* Nút + Nhỏ Nhắn Tinh Tế Dành Cho Admin */}
             <button
               onClick={handleOpenAddModal}
-              title="Admin: Thêm dự án mới"
+              title={isAuthenticated ? "Admin: Thêm dự án mới" : "Admin: Đăng nhập & Thêm dự án"}
               style={{
                 width: "28px",
                 height: "28px",
                 borderRadius: "50%",
-                backgroundColor: "transparent",
+                backgroundColor: isAuthenticated ? "var(--skin-color)" : "transparent",
                 border: "1px solid var(--skin-color)",
-                color: "var(--skin-color)",
+                color: isAuthenticated ? "#fff" : "var(--skin-color)",
                 cursor: "pointer",
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: "14px",
                 transition: "all 0.3s ease",
-                opacity: 0.8
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--skin-color)";
-                e.currentTarget.style.color = "#fff";
-                e.currentTarget.style.opacity = "1";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-                e.currentTarget.style.color = "var(--skin-color)";
-                e.currentTarget.style.opacity = "0.8";
+                opacity: 0.9
               }}
             >
               <i className="fa fa-plus"></i>
             </button>
+
+            {isAuthenticated && (
+              <span style={{ fontSize: "12px", color: "var(--skin-color)", fontWeight: "600" }}>
+                ✓ Admin Mode Active
+              </span>
+            )}
           </div>
         </div>
 
@@ -246,19 +248,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
 
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
                       <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-                        {proj.githubUrl && proj.githubUrl !== "#" && (
-                          <a
-                            href={proj.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ fontSize: "12px", color: "var(--text-black-900)", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "3px" }}
-                            title="Mã nguồn GitHub"
-                          >
-                            <i className="fa-brands fa-github" style={{ fontSize: "14px" }}></i> GitHub
-                          </a>
-                        )}
-
-                        {/* Nút Xem README (Mở Popup xem nội dung file README đã upload) */}
+                        {/* Nút Xem README */}
                         {proj.readmeContent && (
                           <button
                             onClick={() => setActiveReadmeProject(proj)}
@@ -394,7 +384,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
               <h3 style={{ fontSize: "18px", color: "var(--text-black-900)", fontWeight: "700" }}>
-                {isAuthenticated ? "Thêm Dự Án Mới (Admin)" : "Xác Thực Mật Khẩu Admin"}
+                {isAuthenticated ? "Thêm Dự Án Mới (Admin Mode Active)" : "Xác Thực Mật Khẩu Admin"}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -548,25 +538,10 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   />
                 </div>
 
-                {/* Trường 4: Link GitHub */}
-                <div className="form-group" style={{ marginBottom: "15px" }}>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
-                    4. Link GitHub (Source Code Repository)
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="https://github.com/username/project-repo"
-                    value={githubUrl}
-                    onChange={(e) => setGithubUrl(e.target.value)}
-                    style={{ width: "100%", height: "42px", borderRadius: "8px", border: "1px solid var(--bg-black-50)", padding: "0 12px", background: "var(--bg-black-900)", color: "var(--text-black-900)" }}
-                  />
-                </div>
-
-                {/* Trường 5: Upload File README (.md / .txt) duy nhất */}
+                {/* Trường 4: Upload File README (.md / .txt) */}
                 <div className="form-group" style={{ marginBottom: "20px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "8px" }}>
-                    5. Upload File README (.md / .txt) từ máy tính
+                    4. Upload File README (.md / .txt) từ máy tính
                   </label>
                   <input
                     type="file"
