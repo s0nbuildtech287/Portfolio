@@ -350,8 +350,18 @@ ul {
   min-height: 100vh;
   display: flex;
   align-items: center;
+  justify-content: center;
   color: var(--text-black-900);
 }
+
+.home .container {
+  padding-top: 100px;
+  padding-bottom: 80px;
+  margin: auto;
+}
+
+
+
 
 .home .home-info {
   flex: 0 0 60%;
