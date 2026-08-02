@@ -28,6 +28,9 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
   // State cho Viewer xem chi tiết README Popup
   const [activeReadmeProject, setActiveReadmeProject] = useState(null);
 
+  // State cho Modal Phóng To Ảnh (Lightbox)
+  const [activeImage, setActiveImage] = useState(null);
+
   // 1. Load dự án đã lưu & Khôi phục Admin Session từ sessionStorage
   useEffect(() => {
     const savedProjects = localStorage.getItem("portfolio_user_projects");
@@ -58,7 +61,6 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
       reader.onloadend = async () => {
         const base64Data = reader.result;
         try {
-          // Gửi dữ liệu tới API Middleware để ghi file vào thư mục images/projects
           const response = await fetch("/api/upload", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -70,13 +72,13 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
           });
           const resData = await response.json();
           if (resData.success) {
-            setImage(resData.url); // Đường dẫn ảnh lưu trên ổ cứng: /images/projects/...
+            setImage(resData.url);
           } else {
-            setImage(base64Data); // Fallback base64
+            setImage(base64Data);
           }
         } catch (err) {
           console.error("Server upload error:", err);
-          setImage(base64Data); // Fallback base64
+          setImage(base64Data);
         } finally {
           setUploading(false);
         }
@@ -85,7 +87,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     }
   };
 
-  // Xử lý khi Upload file README (.md hoặc .txt) từ máy tính (Tải & lưu vào ổ cứng readmee/)
+  // Xử lý khi Upload file README (.md hoặc .txt) từ máy tính
   const handleReadmeFileUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -97,7 +99,6 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
         setReadmeFileName(file.name);
 
         try {
-          // Gửi dữ liệu tới API Middleware để ghi file vào thư mục readmee
           const response = await fetch("/api/upload", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -109,7 +110,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
           });
           const resData = await response.json();
           if (resData.success) {
-            setReadmeUrl(resData.url); // Đường dẫn file README lưu trên ổ cứng: /readmee/...
+            setReadmeUrl(resData.url);
           }
         } catch (err) {
           console.error("Server upload error:", err);
@@ -279,7 +280,12 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   }}
                 >
                   {/* Ảnh Dự Án */}
-                  <div className="portfolio-img" style={{ height: "140px", overflow: "hidden" }}>
+                  <div
+                    className="portfolio-img"
+                    style={{ height: "140px", overflow: "hidden", cursor: "pointer" }}
+                    onClick={() => setActiveImage(proj.image)}
+                    title="Bấm vào để xem ảnh lớn"
+                  >
                     <img
                       src={proj.image}
                       alt="Project"
@@ -341,14 +347,84 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
         </div>
       </div>
 
+      {/* Modal Popup Phóng To Ảnh Rộng Rãi Căn Giữa Nội Dung Trang */}
+      {activeImage && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            bottom: 0,
+            right: 0,
+            left: window.innerWidth >= 1200 ? "270px" : 0,
+            backgroundColor: "rgba(0,0,0,0.85)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px"
+          }}
+          onClick={() => setActiveImage(null)}
+        >
+          <div
+            style={{
+              backgroundColor: "var(--bg-black-100)",
+              border: "1px solid var(--bg-black-50)",
+              borderRadius: "12px",
+              padding: "18px 22px",
+              boxShadow: "0 10px 40px rgba(0,0,0,0.8)",
+              maxWidth: "880px",
+              width: "92%",
+              maxHeight: "85vh",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              position: "relative"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", borderBottom: "1px solid var(--bg-black-50)", paddingBottom: "10px" }}>
+              <span style={{ fontSize: "15px", color: "var(--text-black-900)", fontWeight: "600" }}>
+                Chi Tiết Ảnh Dự Án
+              </span>
+              <button
+                onClick={() => setActiveImage(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "var(--text-black-900)",
+                  fontSize: "20px",
+                  cursor: "pointer"
+                }}
+              >
+                <i className="fa fa-times"></i>
+              </button>
+            </div>
+
+            <img
+              src={activeImage}
+              alt="Project Preview"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "520px",
+                objectFit: "contain",
+                borderRadius: "8px"
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Modal Popup Xem Nội Dung File README Chi Tiết */}
       {activeReadmeProject && (
         <div
           style={{
             position: "fixed",
-            inset: 0,
+            top: 0,
+            bottom: 0,
+            right: 0,
+            left: window.innerWidth >= 1200 ? "270px" : 0,
             backgroundColor: "rgba(0,0,0,0.8)",
-            zIndex: 99999,
+            zIndex: 9999,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -361,8 +437,8 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
               backgroundColor: "var(--bg-black-100)",
               border: "1px solid var(--bg-black-50)",
               borderRadius: "15px",
-              maxWidth: "650px",
-              width: "100%",
+              maxWidth: "750px",
+              width: "92%",
               padding: "25px",
               boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
               maxHeight: "85vh",
@@ -410,7 +486,10 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
         <div
           style={{
             position: "fixed",
-            inset: 0,
+            top: 0,
+            bottom: 0,
+            right: 0,
+            left: window.innerWidth >= 1200 ? "270px" : 0,
             backgroundColor: "rgba(0,0,0,0.7)",
             zIndex: 9999,
             display: "flex",
@@ -426,7 +505,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
               border: "1px solid var(--bg-black-50)",
               borderRadius: "15px",
               maxWidth: "500px",
-              width: "100%",
+              width: "90%",
               padding: "25px",
               boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
               position: "relative",
