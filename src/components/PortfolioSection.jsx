@@ -35,11 +35,14 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
   // State cho Modal Phóng To Ảnh (Lightbox)
   const [activeImage, setActiveImage] = useState(null);
 
-  // 1. Load dự án từ File Ổ Cứng (data/projects.json) & Fallback localStorage
+  // 1. Load dự án từ File JSON (Hoạt động hoàn hảo cả khi Deploy Vercel/Netlify) & Fallback localStorage
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch("/api/projects");
+        let response = await fetch("/api/projects");
+        if (!response.ok) {
+          response = await fetch("/data/projects.json");
+        }
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data) && data.length > 0) {
