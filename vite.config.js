@@ -9,12 +9,17 @@ function localUploadPlugin() {
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const dataFilePath = path.resolve(__dirname, "data/projects.json");
+        const publicDataFilePath = path.resolve(__dirname, "public/data/projects.json");
 
         // GET /api/projects: Đọc danh sách dự án từ file JSON ổ cứng
         if (req.method === "GET" && req.url === "/api/projects") {
           try {
-            if (fs.existsSync(dataFilePath)) {
-              const fileData = fs.readFileSync(dataFilePath, "utf-8");
+            let targetPath = dataFilePath;
+            if (!fs.existsSync(targetPath) && fs.existsSync(publicDataFilePath)) {
+              targetPath = publicDataFilePath;
+            }
+            if (fs.existsSync(targetPath)) {
+              const fileData = fs.readFileSync(targetPath, "utf-8");
               res.writeHead(200, { "Content-Type": "application/json" });
               res.end(fileData);
             } else {
@@ -28,7 +33,7 @@ function localUploadPlugin() {
           return;
         }
 
-        // POST /api/projects: Lưu danh sách dự án vào file JSON ổ cứng
+        // POST /api/projects: Ghi đồng bộ cả 2 nơi (data/projects.json và public/data/projects.json)
         if (req.method === "POST" && req.url === "/api/projects") {
           let body = "";
           req.on("data", (chunk) => {
@@ -37,10 +42,13 @@ function localUploadPlugin() {
           req.on("end", () => {
             try {
               const dataDir = path.resolve(__dirname, "data");
-              if (!fs.existsSync(dataDir)) {
-                fs.mkdirSync(dataDir, { recursive: true });
-              }
+              const publicDataDir = path.resolve(__dirname, "public/data");
+              if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+              if (!fs.existsSync(publicDataDir)) fs.mkdirSync(publicDataDir, { recursive: true });
+
               fs.writeFileSync(dataFilePath, body, "utf-8");
+              fs.writeFileSync(publicDataFilePath, body, "utf-8");
+
               res.writeHead(200, { "Content-Type": "application/json" });
               res.end(JSON.stringify({ success: true }));
             } catch (err) {
@@ -51,7 +59,7 @@ function localUploadPlugin() {
           return;
         }
 
-        // POST /api/upload: Upload ảnh & file README
+        // POST /api/upload: Upload ảnh & file README đồng bộ vào public/
         if (req.method === "POST" && req.url === "/api/upload") {
           let body = "";
           req.on("data", (chunk) => {
@@ -64,28 +72,37 @@ function localUploadPlugin() {
 
               if (type === "image") {
                 const targetDir = path.resolve(__dirname, "images/projects");
-                if (!fs.existsSync(targetDir)) {
-                  fs.mkdirSync(targetDir, { recursive: true });
-                }
+                const publicTargetDir = path.resolve(__dirname, "public/images/projects");
+
+                if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+                if (!fs.existsSync(publicTargetDir)) fs.mkdirSync(publicTargetDir, { recursive: true });
+
                 const safeName = Date.now() + "_" + fileName.replace(/[^a-zA-Z0-9_.-]/g, "_");
                 const filePath = path.join(targetDir, safeName);
+                const publicFilePath = path.join(publicTargetDir, safeName);
 
                 const base64Data = base64Content.replace(/^data:image\/\w+;base64,/, "");
                 const buffer = Buffer.from(base64Data, "base64");
+
                 fs.writeFileSync(filePath, buffer);
+                fs.writeFileSync(publicFilePath, buffer);
 
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end(JSON.stringify({ success: true, url: `/images/projects/${safeName}` }));
                 return;
               } else if (type === "readme") {
                 const targetDir = path.resolve(__dirname, "readmee");
-                if (!fs.existsSync(targetDir)) {
-                  fs.mkdirSync(targetDir, { recursive: true });
-                }
+                const publicTargetDir = path.resolve(__dirname, "public/readmee");
+
+                if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+                if (!fs.existsSync(publicTargetDir)) fs.mkdirSync(publicTargetDir, { recursive: true });
+
                 const safeName = Date.now() + "_" + fileName.replace(/[^a-zA-Z0-9_.-]/g, "_");
                 const filePath = path.join(targetDir, safeName);
+                const publicFilePath = path.join(publicTargetDir, safeName);
 
                 fs.writeFileSync(filePath, textContent, "utf-8");
+                fs.writeFileSync(publicFilePath, textContent, "utf-8");
 
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end(

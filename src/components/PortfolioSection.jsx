@@ -16,6 +16,8 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
 
   // States cho Form Thêm / Chỉnh Sửa Dự Án
   const [title, setTitle] = useState(""); // Tên dự án
+  const [position, setPosition] = useState(1); // Vị trí / Thứ tự hiển thị (Ví dụ: 1 đứng đầu)
+  const [rating, setRating] = useState(5); // Số sao đánh giá độ hoàn thiện (1 - 5)
   const [imageType, setImageType] = useState("file"); // "file" hoặc "url"
   const [image, setImage] = useState("");
   const [purpose, setPurpose] = useState("");
@@ -83,6 +85,14 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     } catch (err) {
       console.error("Error saving projects to server file:", err);
     }
+  };
+
+  // Xử lý tăng lượt truy cập (+1 lượt click) khi ai đó bấm vào nút Deploy
+  const handleDeployClick = (projId) => {
+    const updatedProjects = projects.map((p) =>
+      p.id === projId ? { ...p, clicks: (p.clicks || 0) + 1 } : p
+    );
+    saveProjectsToDisk(updatedProjects);
   };
 
   // Xử lý khi chọn file ảnh từ máy tính (Tải & lưu vào ổ cứng images/projects/)
@@ -162,6 +172,8 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
   // Reset form dữ liệu
   const resetForm = () => {
     setTitle("");
+    setPosition(projects.length + 1);
+    setRating(5);
     setImage("");
     setPurpose("");
     setDeployUrl("");
@@ -183,6 +195,8 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
   const handleEditProject = (proj) => {
     setEditingProjectId(proj.id);
     setTitle(proj.title || "");
+    setPosition(proj.position || 1);
+    setRating(proj.rating || 5);
     setImage(proj.image || "");
     setPurpose(proj.purpose || "");
     setDeployUrl(proj.deployUrl || "");
@@ -213,11 +227,6 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
       return;
     }
 
-    if (!purpose.trim()) {
-      alert("Vui lòng nhập Mục đích / Mô tả dự án!");
-      return;
-    }
-
     let updatedProjects = [];
 
     if (editingProjectId) {
@@ -227,6 +236,8 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
           ? {
               ...p,
               title: title.trim(),
+              position: Number(position) || 1,
+              rating: Number(rating) || 5,
               image: image.trim() || p.image,
               purpose: purpose.trim(),
               deployUrl: deployUrl.trim() || "#",
@@ -241,6 +252,9 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
       const newProject = {
         id: Date.now(),
         title: title.trim(),
+        position: Number(position) || 1,
+        rating: Number(rating) || 5,
+        clicks: 0,
         image: image.trim() || "images/portfolio/project-1.jpg",
         purpose: purpose.trim(),
         deployUrl: deployUrl.trim() || "#",
@@ -273,6 +287,11 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
       saveProjectsToDisk(updatedProjects);
     }
   };
+
+  // Sắp xếp các dự án theo thứ tự ưu tiên (position tăng dần)
+  const sortedProjects = [...projects].sort(
+    (a, b) => (Number(a.position) || 99) - (Number(b.position) || 99)
+  );
 
   return (
     <section
@@ -324,7 +343,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
 
         {/* Danh sách các dự án */}
         <div className="row">
-          {projects.length === 0 ? (
+          {sortedProjects.length === 0 ? (
             <div className="padd-15" style={{ flex: "0 0 100%", maxWidth: "100%" }}>
               <div
                 className="shahow-dark"
@@ -346,24 +365,31 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
               </div>
             </div>
           ) : (
-            projects.map((proj) => (
+            sortedProjects.map((proj) => (
               <div key={proj.id} className="portfolio-item padd-15">
                 <div
                   className="portfolio-item-inner shadow-dark"
                   style={{
                     backgroundColor: "var(--bg-black-100)",
-                    borderRadius: "10px",
+                    border: "1px solid var(--bg-black-50)",
+                    borderRadius: "14px",
                     position: "relative",
                     display: "flex",
                     flexDirection: "column",
-                    height: "300px",
-                    overflow: "hidden"
+                    height: "290px",
+                    overflow: "hidden",
+                    transition: "all 0.3s ease"
                   }}
                 >
                   {/* Ảnh Dự Án */}
                   <div
-                    className="portfolio-img"
-                    style={{ height: "135px", overflow: "hidden", cursor: "pointer" }}
+                    style={{
+                      height: "160px",
+                      width: "100%",
+                      overflow: "hidden",
+                      cursor: "pointer",
+                      position: "relative"
+                    }}
                     onClick={() => setActiveImage(proj.image)}
                     title="Bấm vào để xem ảnh lớn"
                   >
@@ -374,20 +400,29 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                         e.target.onerror = null;
                         e.target.src = "images/portfolio/project-1.jpg";
                       }}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: "top center",
+                        transition: "transform 0.3s ease",
+                        display: "block"
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                     />
                   </div>
 
-                  {/* Nội dung Tên, Mục đích & Links */}
-                  <div style={{ padding: "12px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  {/* Nội dung Tên, Thông Số Thống Kê & Nút Thao Tác */}
+                  <div style={{ padding: "12px 16px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                     <div>
                       {/* Tên Dự Án */}
                       <h3
                         style={{
-                          fontSize: "15px",
+                          fontSize: "16px",
                           fontWeight: "700",
                           color: "var(--text-black-900)",
-                          marginBottom: "4px",
+                          margin: "0 0 6px 0",
                           whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis"
@@ -397,62 +432,154 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                         {proj.title || "Dự Án"}
                       </h3>
 
-                      {/* Mục đích / Mô tả dự án */}
-                      <p
+                      {/* Hàng Thông Số: Vị trí - Số sao - Lượt truy cập */}
+                      <div
                         style={{
-                          fontSize: "13px",
-                          color: "var(--text-black-700)",
-                          lineHeight: "1.4",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical"
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          flexWrap: "wrap",
+                          fontSize: "12px",
+                          lineHeight: "1.4"
                         }}
                       >
-                        {proj.purpose}
-                      </p>
+                        {/* Vị trí dự án */}
+                        <span
+                          style={{
+                            color: "var(--skin-color)",
+                            fontWeight: "600",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "3px"
+                          }}
+                          title="Vị trí thứ tự ưu tiên dự án"
+                        >
+                          <i className="fa fa-trophy" style={{ fontSize: "11px" }}></i> #{proj.position || 1}
+                        </span>
+
+                        {/* Số sao hoàn thiện (1 - 5 sao) */}
+                        <span
+                          style={{
+                            color: "#f59e0b",
+                            fontWeight: "600",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "3px"
+                          }}
+                          title="Độ hoàn thiện dự án"
+                        >
+                          <i className="fa fa-star" style={{ fontSize: "11px" }}></i> {proj.rating || 5}/5
+                        </span>
+
+                        {/* Số lượt click truy cập Deploy */}
+                        <span
+                          style={{
+                            color: "var(--text-black-700)",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px"
+                          }}
+                          title="Số lượt click truy cập nút Deploy"
+                        >
+                          <i className="fa fa-mouse-pointer" style={{ fontSize: "11px", color: "var(--skin-color)" }}></i> {proj.clicks || 0} lượt truy cập
+                        </span>
+                      </div>
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
-                      <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+                    {/* Nút Liên Kết & Thao Tác Admin */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid var(--bg-black-50)" }}>
+                      <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
                         {/* Nút Xem README */}
                         {proj.readmeContent && (
                           <button
                             onClick={() => setActiveReadmeProject(proj)}
-                            style={{ background: "none", border: "none", padding: 0, fontSize: "12px", color: "var(--text-black-900)", fontWeight: "600", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "3px" }}
+                            style={{
+                              background: "var(--bg-black-50)",
+                              border: "none",
+                              padding: "4px 10px",
+                              borderRadius: "6px",
+                              fontSize: "12px",
+                              color: "var(--text-black-900)",
+                              fontWeight: "600",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              transition: "all 0.2s ease"
+                            }}
                             title="Xem README chi tiết"
                           >
                             <i className="fa fa-book-open" style={{ fontSize: "12px", color: "var(--skin-color)" }}></i> README
                           </button>
                         )}
 
+                        {/* Nút Link Deploy (Tự động +1 lượt click khi bấm) */}
                         {proj.deployUrl && proj.deployUrl !== "#" && (
                           <a
                             href={proj.deployUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{ fontSize: "12px", color: "var(--skin-color)", fontWeight: "600", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "3px" }}
-                            title="Xem Demo / Deploy"
+                            onClick={() => handleDeployClick(proj.id)}
+                            style={{
+                              background: "transparent",
+                              border: "1px solid var(--skin-color)",
+                              padding: "3px 10px",
+                              borderRadius: "6px",
+                              fontSize: "12px",
+                              color: "var(--skin-color)",
+                              fontWeight: "600",
+                              textDecoration: "none",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              transition: "all 0.2s ease"
+                            }}
+                            title="Xem Live Demo (Tăng +1 lượt truy cập)"
                           >
-                            <i className="fa fa-external-link-alt"></i> Deploy
+                            <i className="fa fa-external-link-alt" style={{ fontSize: "11px" }}></i> Deploy
                           </a>
                         )}
                       </div>
 
-                      {/* Nút Edit & Trash (Chỉ hiện khi Admin authenticated) */}
+                      {/* Nút Edit & Trash (Chỉ dành cho Admin) */}
                       {isAuthenticated && (
-                        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                           <button
                             onClick={() => handleEditProject(proj)}
-                            style={{ background: "none", border: "none", color: "var(--skin-color)", cursor: "pointer", fontSize: "14px" }}
+                            style={{
+                              width: "28px",
+                              height: "28px",
+                              borderRadius: "50%",
+                              backgroundColor: "var(--bg-black-50)",
+                              border: "none",
+                              color: "var(--skin-color)",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "13px",
+                              transition: "all 0.2s ease"
+                            }}
                             title="Chỉnh sửa dự án"
                           >
                             <i className="fa fa-pen"></i>
                           </button>
                           <button
                             onClick={() => handleDeleteProject(proj.id)}
-                            style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "14px" }}
+                            style={{
+                              width: "28px",
+                              height: "28px",
+                              borderRadius: "50%",
+                              backgroundColor: "rgba(239, 68, 68, 0.1)",
+                              border: "none",
+                              color: "#ef4444",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "13px",
+                              transition: "all 0.2s ease"
+                            }}
                             title="Xóa dự án"
                           >
                             <i className="fa fa-trash"></i>
@@ -709,10 +836,47 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   />
                 </div>
 
-                {/* Trường 2: Ảnh Dự Án */}
+                {/* Hàng 2: Vị Trí & Đánh Giá Số Sao */}
+                <div style={{ display: "flex", gap: "15px", marginBottom: "15px" }}>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
+                      2. Vị Trí Ưu Tiên (Thứ Tự)
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      className="form-control"
+                      placeholder="1"
+                      required
+                      value={position}
+                      onChange={(e) => setPosition(e.target.value)}
+                      style={{ width: "100%", height: "42px", borderRadius: "8px", border: "1px solid var(--bg-black-50)", padding: "0 12px", background: "var(--bg-black-900)", color: "var(--text-black-900)" }}
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
+                      3. Đánh Giá Sao (1-5 ⭐)
+                    </label>
+                    <select
+                      className="form-control"
+                      value={rating}
+                      onChange={(e) => setRating(e.target.value)}
+                      style={{ width: "100%", height: "42px", borderRadius: "8px", border: "1px solid var(--bg-black-50)", padding: "0 12px", background: "var(--bg-black-900)", color: "var(--text-black-900)" }}
+                    >
+                      <option value={5}>⭐⭐⭐⭐⭐ 5/5 Stars</option>
+                      <option value={4}>⭐⭐⭐⭐ 4/5 Stars</option>
+                      <option value={3}>⭐⭐⭐ 3/5 Stars</option>
+                      <option value={2}>⭐⭐ 2/5 Stars</option>
+                      <option value={1}>⭐ 1/5 Star</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Trường 3: Ảnh Dự Án */}
                 <div className="form-group" style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "8px" }}>
-                    2. Ảnh Dự Án (Upload lưu thẳng vào images/projects/)
+                    4. Ảnh Dự Án (Upload lưu thẳng vào images/projects/)
                   </label>
 
                   <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
@@ -782,15 +946,14 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   )}
                 </div>
 
-                {/* Trường 3: Mục Đích / Mô Tả */}
+                {/* Trường 4: Mục Đích / Mô Tả */}
                 <div className="form-group" style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
-                    3. Mục Đích / Mô Tả Dự Án *
+                    5. Mục Đích / Mô Tả Dự Án
                   </label>
                   <textarea
                     className="form-control"
                     placeholder="Nhập mục đích hoặc mô tả ngắn gọn về dự án..."
-                    required
                     rows={3}
                     value={purpose}
                     onChange={(e) => setPurpose(e.target.value)}
@@ -798,10 +961,10 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   ></textarea>
                 </div>
 
-                {/* Trường 4: Link Deploy */}
+                {/* Trường 5: Link Deploy */}
                 <div className="form-group" style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
-                    4. Link Deploy (Vercel / Website Link)
+                    6. Link Deploy (Vercel / Website Link)
                   </label>
                   <input
                     type="text"
@@ -813,10 +976,10 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   />
                 </div>
 
-                {/* Trường 5: Upload File README (.md / .txt) lưu thẳng vào readmee/ */}
+                {/* Trường 6: Upload File README (.md / .txt) lưu thẳng vào readmee/ */}
                 <div className="form-group" style={{ marginBottom: "20px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "8px" }}>
-                    5. Upload File README (.md / .txt) (Lưu thẳng vào readmee/)
+                    7. Upload File README (.md / .txt) (Lưu thẳng vào readmee/)
                   </label>
                   <input
                     type="file"
