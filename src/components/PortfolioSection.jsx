@@ -5,6 +5,7 @@ const ADMIN_PASSWORD = "Sondeptrai123@k";
 const PortfolioSection = ({ isActive, isBackSection }) => {
   const [projects, setProjects] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState(null); // ID dự án đang chỉnh sửa
   
   // State xác thực Admin (Lưu Session)
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,7 +14,8 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
   const [inputPass, setInputPass] = useState("");
   const [passError, setPassError] = useState("");
 
-  // States cho Form Thêm Dự Án
+  // States cho Form Thêm / Chỉnh Sửa Dự Án
+  const [title, setTitle] = useState(""); // Tên dự án
   const [imageType, setImageType] = useState("file"); // "file" hoặc "url"
   const [image, setImage] = useState("");
   const [purpose, setPurpose] = useState("");
@@ -31,22 +33,57 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
   // State cho Modal Phóng To Ảnh (Lightbox)
   const [activeImage, setActiveImage] = useState(null);
 
-  // 1. Load dự án đã lưu & Khôi phục Admin Session từ sessionStorage
+  // 1. Load dự án từ File Ổ Cứng (data/projects.json) & Fallback localStorage
   useEffect(() => {
-    const savedProjects = localStorage.getItem("portfolio_user_projects");
-    if (savedProjects) {
+    const fetchProjects = async () => {
       try {
-        setProjects(JSON.parse(savedProjects));
+        const response = await fetch("/api/projects");
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setProjects(data);
+            localStorage.setItem("portfolio_user_projects", JSON.stringify(data));
+            return;
+          }
+        }
       } catch (err) {
-        console.error("Failed to parse stored projects:", err);
+        console.error("Failed to load projects from server file:", err);
       }
-    }
+
+      // Fallback localStorage
+      const savedProjects = localStorage.getItem("portfolio_user_projects");
+      if (savedProjects) {
+        try {
+          setProjects(JSON.parse(savedProjects));
+        } catch (err) {
+          console.error("Failed to parse stored projects:", err);
+        }
+      }
+    };
+
+    fetchProjects();
 
     const adminSession = sessionStorage.getItem("portfolio_admin_session");
     if (adminSession === "true") {
       setIsAuthenticated(true);
     }
   }, []);
+
+  // Hàm đồng bộ và lưu danh sách dự án trực tiếp vào file data/projects.json trên ổ cứng
+  const saveProjectsToDisk = async (newProjectsList) => {
+    setProjects(newProjectsList);
+    localStorage.setItem("portfolio_user_projects", JSON.stringify(newProjectsList));
+
+    try {
+      await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProjectsList)
+      });
+    } catch (err) {
+      console.error("Error saving projects to server file:", err);
+    }
+  };
 
   // Xử lý khi chọn file ảnh từ máy tính (Tải & lưu vào ổ cứng images/projects/)
   const handleFileUpload = async (e) => {
@@ -122,10 +159,36 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     }
   };
 
-  // Xử lý mở Modal Admin
+  // Reset form dữ liệu
+  const resetForm = () => {
+    setTitle("");
+    setImage("");
+    setPurpose("");
+    setDeployUrl("");
+    setReadmeFileName("");
+    setReadmeContent("");
+    setReadmeUrl("");
+    setEditingProjectId(null);
+  };
+
+  // Xử lý mở Modal Thêm Mới Dự Án
   const handleOpenAddModal = () => {
+    resetForm();
     setInputPass("");
     setPassError("");
+    setShowModal(true);
+  };
+
+  // Xử lý mở Modal Chỉnh Sửa Dự Án
+  const handleEditProject = (proj) => {
+    setEditingProjectId(proj.id);
+    setTitle(proj.title || "");
+    setImage(proj.image || "");
+    setPurpose(proj.purpose || "");
+    setDeployUrl(proj.deployUrl || "");
+    setReadmeFileName(proj.readmeFileName || "");
+    setReadmeContent(proj.readmeContent || "");
+    setReadmeUrl(proj.readmeUrl || "");
     setShowModal(true);
   };
 
@@ -141,36 +204,55 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
     }
   };
 
-  // Xử lý Thêm dự án mới
-  const handleAddProject = (e) => {
+  // Xử lý Thêm mới hoặc Cập nhật dự án
+  const handleSaveProject = (e) => {
     e.preventDefault();
+
+    if (!title.trim()) {
+      alert("Vui lòng nhập Tên dự án!");
+      return;
+    }
 
     if (!purpose.trim()) {
       alert("Vui lòng nhập Mục đích / Mô tả dự án!");
       return;
     }
 
-    const newProject = {
-      id: Date.now(),
-      image: image.trim() || "images/portfolio/project-1.jpg",
-      purpose: purpose.trim(),
-      deployUrl: deployUrl.trim() || "#",
-      readmeFileName: readmeFileName,
-      readmeContent: readmeContent,
-      readmeUrl: readmeUrl
-    };
+    let updatedProjects = [];
 
-    const updatedProjects = [...projects, newProject];
-    setProjects(updatedProjects);
-    localStorage.setItem("portfolio_user_projects", JSON.stringify(updatedProjects));
+    if (editingProjectId) {
+      // Cập nhật dự án sẵn có
+      updatedProjects = projects.map((p) =>
+        p.id === editingProjectId
+          ? {
+              ...p,
+              title: title.trim(),
+              image: image.trim() || p.image,
+              purpose: purpose.trim(),
+              deployUrl: deployUrl.trim() || "#",
+              readmeFileName: readmeFileName || p.readmeFileName,
+              readmeContent: readmeContent || p.readmeContent,
+              readmeUrl: readmeUrl || p.readmeUrl
+            }
+          : p
+      );
+    } else {
+      // Thêm mới dự án
+      const newProject = {
+        id: Date.now(),
+        title: title.trim(),
+        image: image.trim() || "images/portfolio/project-1.jpg",
+        purpose: purpose.trim(),
+        deployUrl: deployUrl.trim() || "#",
+        readmeFileName: readmeFileName,
+        readmeContent: readmeContent,
+        readmeUrl: readmeUrl
+      };
+      updatedProjects = [...projects, newProject];
+    }
 
-    // Reset form & Đóng modal
-    setImage("");
-    setPurpose("");
-    setDeployUrl("");
-    setReadmeFileName("");
-    setReadmeContent("");
-    setReadmeUrl("");
+    saveProjectsToDisk(updatedProjects);
+    resetForm();
     setShowModal(false);
   };
 
@@ -188,8 +270,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
 
     if (window.confirm("Bạn có chắc chắn muốn xóa dự án này?")) {
       const updatedProjects = projects.filter((p) => p.id !== id);
-      setProjects(updatedProjects);
-      localStorage.setItem("portfolio_user_projects", JSON.stringify(updatedProjects));
+      saveProjectsToDisk(updatedProjects);
     }
   };
 
@@ -275,14 +356,14 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                     position: "relative",
                     display: "flex",
                     flexDirection: "column",
-                    height: "270px",
+                    height: "300px",
                     overflow: "hidden"
                   }}
                 >
                   {/* Ảnh Dự Án */}
                   <div
                     className="portfolio-img"
-                    style={{ height: "140px", overflow: "hidden", cursor: "pointer" }}
+                    style={{ height: "135px", overflow: "hidden", cursor: "pointer" }}
                     onClick={() => setActiveImage(proj.image)}
                     title="Bấm vào để xem ảnh lớn"
                   >
@@ -297,11 +378,41 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                     />
                   </div>
 
-                  {/* Nội dung Mục đích & Links */}
+                  {/* Nội dung Tên, Mục đích & Links */}
                   <div style={{ padding: "12px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                    <p style={{ fontSize: "14px", color: "var(--text-black-900)", fontWeight: "500", lineHeight: "1.4", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
-                      {proj.purpose}
-                    </p>
+                    <div>
+                      {/* Tên Dự Án */}
+                      <h3
+                        style={{
+                          fontSize: "15px",
+                          fontWeight: "700",
+                          color: "var(--text-black-900)",
+                          marginBottom: "4px",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis"
+                        }}
+                        title={proj.title || "Dự Án"}
+                      >
+                        {proj.title || "Dự Án"}
+                      </h3>
+
+                      {/* Mục đích / Mô tả dự án */}
+                      <p
+                        style={{
+                          fontSize: "13px",
+                          color: "var(--text-black-700)",
+                          lineHeight: "1.4",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical"
+                        }}
+                      >
+                        {proj.purpose}
+                      </p>
+                    </div>
 
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
                       <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
@@ -329,14 +440,24 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                         )}
                       </div>
 
+                      {/* Nút Edit & Trash (Chỉ hiện khi Admin authenticated) */}
                       {isAuthenticated && (
-                        <button
-                          onClick={() => handleDeleteProject(proj.id)}
-                          style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "14px" }}
-                          title="Xóa dự án"
-                        >
-                          <i className="fa fa-trash"></i>
-                        </button>
+                        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                          <button
+                            onClick={() => handleEditProject(proj)}
+                            style={{ background: "none", border: "none", color: "var(--skin-color)", cursor: "pointer", fontSize: "14px" }}
+                            title="Chỉnh sửa dự án"
+                          >
+                            <i className="fa fa-pen"></i>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProject(proj.id)}
+                            style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "14px" }}
+                            title="Xóa dự án"
+                          >
+                            <i className="fa fa-trash"></i>
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -481,7 +602,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
         </div>
       )}
 
-      {/* Modal Admin (Xác thực mật khẩu -> Form Thêm Dự Án) */}
+      {/* Modal Admin (Xác thực mật khẩu -> Form Thêm / Chỉnh Sửa Dự Án) */}
       {showModal && (
         <div
           style={{
@@ -516,7 +637,11 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
               <h3 style={{ fontSize: "18px", color: "var(--text-black-900)", fontWeight: "700" }}>
-                {isAuthenticated ? "Thêm Dự Án Mới (Admin Mode Active)" : "Xác Thực Mật Khẩu Admin"}
+                {!isAuthenticated
+                  ? "Xác Thực Mật Khẩu Admin"
+                  : editingProjectId
+                  ? "Chỉnh Sửa Dự Án"
+                  : "Thêm Dự Án Mới"}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -530,7 +655,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
               /* Bước 1: Form Nhập Mật Khẩu */
               <form onSubmit={handleVerifyPassword}>
                 <p style={{ fontSize: "14px", color: "var(--text-black-700)", marginBottom: "15px" }}>
-                  Vui lòng nhập mật khẩu Admin để quyền thêm mới dự án.
+                  Vui lòng nhập mật khẩu Admin để thực hiện thao tác này.
                 </p>
 
                 {passError && (
@@ -566,12 +691,28 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                 </div>
               </form>
             ) : (
-              /* Bước 2: Form Nhập Dự Án */
-              <form onSubmit={handleAddProject}>
-                {/* Trường 1: Ảnh Dự Án */}
+              /* Bước 2: Form Thêm / Chỉnh Sửa Dự Án */
+              <form onSubmit={handleSaveProject}>
+                {/* Trường 1: Tên Dự Án */}
+                <div className="form-group" style={{ marginBottom: "15px" }}>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
+                    1. Tên Dự Án *
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Ví dụ: Nền Tảng Đầu Tư Quant Trading"
+                    required
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    style={{ width: "100%", height: "42px", borderRadius: "8px", border: "1px solid var(--bg-black-50)", padding: "0 12px", background: "var(--bg-black-900)", color: "var(--text-black-900)" }}
+                  />
+                </div>
+
+                {/* Trường 2: Ảnh Dự Án */}
                 <div className="form-group" style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "8px" }}>
-                    1. Ảnh Dự Án (Upload lưu thẳng vào images/projects/)
+                    2. Ảnh Dự Án (Upload lưu thẳng vào images/projects/)
                   </label>
 
                   <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
@@ -641,10 +782,10 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   )}
                 </div>
 
-                {/* Trường 2: Mục Đích / Mô Tả */}
+                {/* Trường 3: Mục Đích / Mô Tả */}
                 <div className="form-group" style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
-                    2. Mục Đích / Mô Tả Dự Án *
+                    3. Mục Đích / Mô Tả Dự Án *
                   </label>
                   <textarea
                     className="form-control"
@@ -657,10 +798,10 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   ></textarea>
                 </div>
 
-                {/* Trường 3: Link Deploy */}
+                {/* Trường 4: Link Deploy */}
                 <div className="form-group" style={{ marginBottom: "15px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "6px" }}>
-                    3. Link Deploy (Vercel / Website Link)
+                    4. Link Deploy (Vercel / Website Link)
                   </label>
                   <input
                     type="text"
@@ -672,10 +813,10 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                   />
                 </div>
 
-                {/* Trường 4: Upload File README (.md / .txt) lưu thẳng vào readmee/ */}
+                {/* Trường 5: Upload File README (.md / .txt) lưu thẳng vào readmee/ */}
                 <div className="form-group" style={{ marginBottom: "20px" }}>
                   <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "var(--text-black-900)", marginBottom: "8px" }}>
-                    4. Upload File README (.md / .txt) (Lưu thẳng vào readmee/)
+                    5. Upload File README (.md / .txt) (Lưu thẳng vào readmee/)
                   </label>
                   <input
                     type="file"
@@ -700,7 +841,7 @@ const PortfolioSection = ({ isActive, isBackSection }) => {
                     Hủy
                   </button>
                   <button type="submit" className="btn" style={{ padding: "8px 22px" }} disabled={uploading}>
-                    {uploading ? "Đang lưu..." : "Lưu Dự Án"}
+                    {uploading ? "Đang lưu..." : editingProjectId ? "Cập Nhật Dự Án" : "Lưu Dự Án"}
                   </button>
                 </div>
               </form>

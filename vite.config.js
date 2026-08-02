@@ -8,6 +8,50 @@ function localUploadPlugin() {
     name: "local-upload-plugin",
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
+        const dataFilePath = path.resolve(__dirname, "data/projects.json");
+
+        // GET /api/projects: Đọc danh sách dự án từ file JSON ổ cứng
+        if (req.method === "GET" && req.url === "/api/projects") {
+          try {
+            if (fs.existsSync(dataFilePath)) {
+              const fileData = fs.readFileSync(dataFilePath, "utf-8");
+              res.writeHead(200, { "Content-Type": "application/json" });
+              res.end(fileData);
+            } else {
+              res.writeHead(200, { "Content-Type": "application/json" });
+              res.end(JSON.stringify([]));
+            }
+          } catch (err) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: err.message }));
+          }
+          return;
+        }
+
+        // POST /api/projects: Lưu danh sách dự án vào file JSON ổ cứng
+        if (req.method === "POST" && req.url === "/api/projects") {
+          let body = "";
+          req.on("data", (chunk) => {
+            body += chunk.toString();
+          });
+          req.on("end", () => {
+            try {
+              const dataDir = path.resolve(__dirname, "data");
+              if (!fs.existsSync(dataDir)) {
+                fs.mkdirSync(dataDir, { recursive: true });
+              }
+              fs.writeFileSync(dataFilePath, body, "utf-8");
+              res.writeHead(200, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ success: true }));
+            } catch (err) {
+              res.writeHead(500, { "Content-Type": "application/json" });
+              res.end(JSON.stringify({ success: false, error: err.message }));
+            }
+          });
+          return;
+        }
+
+        // POST /api/upload: Upload ảnh & file README
         if (req.method === "POST" && req.url === "/api/upload") {
           let body = "";
           req.on("data", (chunk) => {
@@ -60,9 +104,10 @@ function localUploadPlugin() {
               return;
             }
           });
-        } else {
-          next();
+          return;
         }
+
+        next();
       });
     }
   };
