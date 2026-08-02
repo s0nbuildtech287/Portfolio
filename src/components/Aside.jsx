@@ -5,7 +5,7 @@ const Aside = ({ activeSection, onSelectSection, isNavOpen, onToggleNav }) => {
     { id: "home", label: "Home", icon: "fa fa-home" },
     { id: "about", label: "About", icon: "fa fa-user" },
     { id: "services", label: "Services", icon: "fa fa-list" },
-    { id: "portfolio", label: "Portfolio", icon: "fa fa-briefcase" },
+    { id: "projects", label: "Projects", icon: "fa fa-briefcase" },
     { id: "contact", label: "Contact", icon: "fa fa-comments" },
   ];
 

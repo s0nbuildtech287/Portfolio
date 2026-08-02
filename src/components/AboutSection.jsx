@@ -19,84 +19,83 @@ const AboutSection = ({ isActive, isBackSection, onNavigateContact }) => {
                 <h3>
                   Hi, I'm Xuan Son and I am a<span> Fullstack Developer & Data Analyst </span>
                 </h3>
-                <p>Tôi đã tốt nghiệp Cử nhân Hệ thống Thông tin. Dưới đây là một số thông tin cá nhân và hành trình làm việc chuyên môn của tôi.</p>
+                <p>Tôi đã tốt nghiệp Cử nhân Hệ thống Thông tin. Dưới đây là thông tin cá nhân và kỹ năng chuyên môn của tôi.</p>
               </div>
             </div>
-            <div className="row">
+
+            {/* Row chứa 2 cột Cân Bằng 50% - 50% */}
+            <div className="row about-balanced-row">
+              {/* Cột Trái: 5 Trường Thông Tin Cá Nhân */}
               <div className="personal-info padd-15">
-                <div className="row">
-                  <div className="info-item padd-15">
-                    <p>Birthday : <span>28 July 2004</span></p>
+                <div className="info-list-stacked">
+                  <div className="info-item-stacked">
+                    <p>Birthday : <span>28 July 2004 (21 Age)</span></p>
                   </div>
-                  <div className="info-item padd-15">
-                    <p>Age : <span>21</span></p>
-                  </div>
-                  <div className="info-item padd-15">
-                    <p>Website : <span>www.xson.vn</span></p>
-                  </div>
-                  <div className="info-item padd-15">
-                    <p>Email : <span>buixu4ns0n@gmail.com</span></p>
-                  </div>
-                  <div className="info-item padd-15">
+                  <div className="info-item-stacked">
                     <p>Degree : <span>B.S. in Information Systems (Graduated)</span></p>
                   </div>
-                  <div className="info-item padd-15">
-                    <p>Phone : <span>086.609.7785</span></p>
+                  <div className="info-item-stacked">
+                    <p>English : <span>IELTS 6.0 Certificate</span></p>
                   </div>
-                  <div className="info-item padd-15">
-                    <p>City : <span>Ha Noi</span></p>
+                  <div className="info-item-stacked">
+                    <p>Email & Phone : <span>buixu4ns0n@gmail.com | 086.609.7785</span></p>
                   </div>
-                  <div className="info-item padd-15">
-                    <p>Freelance : <span>Available for Projects</span></p>
+                  <div className="info-item-stacked">
+                    <p>City & Status : <span>Ha Noi (Available for Projects)</span></p>
                   </div>
                 </div>
-                <div className="row">
-                  <div className="buttons padd-15">
-                    <a
-                      href="#contact"
-                      className="btn hire-me"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onNavigateContact();
-                      }}
-                    >
-                      Hire me
-                    </a>
-                  </div>
+
+                <div className="buttons">
+                  <a
+                    href="#contact"
+                    className="btn hire-me"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onNavigateContact();
+                    }}
+                  >
+                    Hire me
+                  </a>
                 </div>
               </div>
+
+              {/* Cột Phải: 5 Thanh Kỹ Năng Song Song Bằng Nhau */}
               <div className="skills padd-15">
-                <div className="row">
-                  <div className="skill-item padd-15">
-                    <h5>Fullstack (Node, React, Java, PHP)</h5>
+                <div className="skills-list-stacked">
+                  <div className="skill-item">
+                    <h5>Languages <span>(Python, JS/TS, Java, PHP)</span></h5>
+                    <div className="progress">
+                      <div className="progress-in" style={{ width: "90%" }}></div>
+                      <div className="skill-percent">90%</div>
+                    </div>
+                  </div>
+
+                  <div className="skill-item">
+                    <h5>Fullstack Frameworks <span>(React, Node, NestJS, Laravel)</span></h5>
                     <div className="progress">
                       <div className="progress-in" style={{ width: "88%" }}></div>
                       <div className="skill-percent">88%</div>
                     </div>
                   </div>
-                  <div className="skill-item padd-15">
-                    <h5>Quant Finance Dev</h5>
+
+                  <div className="skill-item">
+                    <h5>AI & Data <span>(Scikit-Learn, TensorFlow, Pandas)</span></h5>
                     <div className="progress">
                       <div className="progress-in" style={{ width: "85%" }}></div>
                       <div className="skill-percent">85%</div>
                     </div>
                   </div>
-                  <div className="skill-item padd-15">
-                    <h5>Data Analysis (SQL, Python)</h5>
+
+                  <div className="skill-item">
+                    <h5>Quant Finance Dev & Data Analytics</h5>
                     <div className="progress">
                       <div className="progress-in" style={{ width: "85%" }}></div>
                       <div className="skill-percent">85%</div>
                     </div>
                   </div>
-                  <div className="skill-item padd-15">
-                    <h5>AI Engineering Application</h5>
-                    <div className="progress">
-                      <div className="progress-in" style={{ width: "80%" }}></div>
-                      <div className="skill-percent">80%</div>
-                    </div>
-                  </div>
-                  <div className="skill-item padd-15">
-                    <h5>Mobile (React Native)</h5>
+
+                  <div className="skill-item">
+                    <h5>English Communication <span>(IELTS 6.0 Certificate)</span></h5>
                     <div className="progress">
                       <div className="progress-in" style={{ width: "75%" }}></div>
                       <div className="skill-percent">75%</div>
@@ -105,8 +104,10 @@ const AboutSection = ({ isActive, isBackSection, onNavigateContact }) => {
                 </div>
               </div>
             </div>
+
+            {/* Timeline Row */}
             <div className="row">
-              {/* Education Timeline (Từ trước đến nay) */}
+              {/* Education Timeline */}
               <div className="education padd-15">
                 <h3 className="title">Education</h3>
                 <div className="row">
@@ -141,7 +142,7 @@ const AboutSection = ({ isActive, isBackSection, onNavigateContact }) => {
                 </div>
               </div>
 
-              {/* Experience Timeline (Từ trước đến nay) */}
+              {/* Experience Timeline */}
               <div className="experience padd-15">
                 <h3 className="title">Experience</h3>
                 <div className="row">

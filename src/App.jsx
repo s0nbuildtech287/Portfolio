@@ -15,7 +15,7 @@ function App() {
   // Scroll Spy: Tự động cập nhật Navigator theo vị trí cuộn trang khi cuộn Landing Page
   useEffect(() => {
     const handleScroll = () => {
-      const sectionIds = ["home", "about", "services", "portfolio", "contact"];
+      const sectionIds = ["home", "about", "services", "projects", "contact"];
       const scrollPosition = window.scrollY + 250;
 
       for (let i = sectionIds.length - 1; i >= 0; i--) {
