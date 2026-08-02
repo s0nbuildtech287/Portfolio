@@ -3,6 +3,36 @@ import react from "@vitejs/plugin-react";
 import fs from "fs";
 import path from "path";
 
+function copyRecursiveSync(src, dest) {
+  if (!fs.existsSync(src)) return;
+  const stats = fs.statSync(src);
+  if (stats.isDirectory()) {
+    if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+    fs.readdirSync(src).forEach((childItemName) => {
+      copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
+    });
+  } else {
+    if (!fs.existsSync(path.dirname(dest))) fs.mkdirSync(path.dirname(dest), { recursive: true });
+    fs.copyFileSync(src, dest);
+  }
+}
+
+function syncStaticAssetsPlugin() {
+  return {
+    name: "sync-static-assets",
+    buildStart() {
+      try {
+        copyRecursiveSync(path.resolve(__dirname, "images"), path.resolve(__dirname, "public/images"));
+        copyRecursiveSync(path.resolve(__dirname, "readmee"), path.resolve(__dirname, "public/readmee"));
+        copyRecursiveSync(path.resolve(__dirname, "data"), path.resolve(__dirname, "public/data"));
+        console.log("✓ Synchronized static assets (images, readmee, data) into public/");
+      } catch (err) {
+        console.error("Error syncing static assets:", err);
+      }
+    }
+  };
+}
+
 function localUploadPlugin() {
   return {
     name: "local-upload-plugin",
@@ -131,7 +161,7 @@ function localUploadPlugin() {
 }
 
 export default defineConfig({
-  plugins: [react(), localUploadPlugin()],
+  plugins: [react(), syncStaticAssetsPlugin(), localUploadPlugin()],
   server: {
     port: 3000
   }
