@@ -7,6 +7,36 @@ const ContactSection = ({ isActive, isBackSection }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!formRef.current) return;
+
+    // 1. Anti-Spam: Bẫy Honeypot Field (Bot tự động điền sẽ bị chặn ngay)
+    const honeypot = formRef.current.elements["bot_field"]?.value;
+    if (honeypot) {
+      // Giả lập thành công đối với Bot để Bot dừng spam mà không tốn EmailJS quota
+      alert("Message sent successfully!");
+      formRef.current.reset();
+      return;
+    }
+
+    // 2. Anti-Spam: Rate Limiting (Giới hạn 60 giây mới cho gửi lại 1 lần)
+    const lastSent = localStorage.getItem("contact_last_sent");
+    const now = Date.now();
+    const COOLDOWN_TIME = 60000; // 60s
+
+    if (lastSent && now - parseInt(lastSent, 10) < COOLDOWN_TIME) {
+      const waitSeconds = Math.ceil((COOLDOWN_TIME - (now - parseInt(lastSent, 10))) / 1000);
+      alert(`Bạn vừa gửi tin nhắn xong. Vui lòng chờ ${waitSeconds} giây nữa trước khi gửi tiếp để tránh bị spam!`);
+      return;
+    }
+
+    // 3. Kiểm tra độ dài tin nhắn tối thiểu
+    const message = formRef.current.elements["message"]?.value || "";
+    if (message.trim().length < 5) {
+      alert("Vui lòng nhập nội dung tin nhắn chi tiết hơn (tối thiểu 5 ký tự)!");
+      return;
+    }
+
     setSending(true);
 
     emailjs
@@ -19,6 +49,8 @@ const ContactSection = ({ isActive, isBackSection }) => {
       .then(
         () => {
           setSending(false);
+          // Lưu thời điểm gửi thành công để kích hoạt Cooldown
+          localStorage.setItem("contact_last_sent", Date.now().toString());
           alert("Message sent successfully!");
           if (formRef.current) formRef.current.reset();
         },
@@ -76,6 +108,15 @@ const ContactSection = ({ isActive, isBackSection }) => {
         <h4 className="contact-sub-title padd-15">I'M VERY RESPONSIVE TO MESSAGES</h4>
         <div className="row">
           <form className="contact-form padd-15" id="contactForm" ref={formRef} onSubmit={handleSubmit}>
+            {/* Honeypot Field ẩn - Bẫy chống Bot Spam tự động */}
+            <input
+              type="text"
+              name="bot_field"
+              tabIndex="-1"
+              autoComplete="off"
+              style={{ display: "none", position: "absolute", left: "-9999px" }}
+            />
+
             <div className="row">
               <div className="form-item col-6 padd-15">
                 <div className="form-group">
